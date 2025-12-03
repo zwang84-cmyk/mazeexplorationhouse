@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Exploration - Help Find the Way Home!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Maze Exploration</h1>
+            <p>Help the character find their way home!</p>
+        </div>
+
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">Lives:</span>
+                <span id="lives">❤️❤️❤️</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Flashlight Uses:</span>
+                <span id="flashlight-uses">🔦🔦🔦</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Phase:</span>
+                <span id="phase">Click to use flashlight!</span>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div id="modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title"></h2>
+                <p id="modal-message"></p>
+                <button id="restart-btn" class="btn">Restart Game</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <ul>
+                <li>🔦 Click to use flashlight and reveal the maze (10 seconds each, 3 uses total)</li>
+                <li>👀 Study the maze carefully during flashlight time</li>
+                <li>🖱️ After flashlight expires, move your mouse to guide the character</li>
+                <li>🏠 Reach the house to win!</li>
+                <li>❤️ Avoid dead ends or you'll lose a life (3 lives total)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
