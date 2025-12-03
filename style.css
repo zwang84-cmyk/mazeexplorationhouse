@@ -62,8 +62,46 @@ body {
     font-size: 0.9em;
 }
 
-#lives, #flashlight-uses {
+#lives {
     font-size: 1.5em;
+}
+
+.flashlight-btn {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.flashlight-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.flashlight-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.flashlight-btn:disabled {
+    background: #9CA3AF;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#flashlight-count {
+    font-size: 0.8em;
+    opacity: 0.9;
 }
 
 #phase {

@@ -7,22 +7,21 @@ const CONFIG = {
     colors: {
         background: '#D4A574',  // Light brown
         path: '#FFFFFF',        // White
-        clouds: 'rgba(173, 216, 230, 0.95)', // Light blue with opacity
+        darkClouds: 'rgba(40, 40, 45, 0.98)', // Dark gray/black clouds
         character: '#FFD700',   // Gold
         house: '#8B4513',       // Brown
-        flashlight: 'rgba(255, 255, 150, 0.3)'
     },
     character: {
-        size: 12,
-        speed: 2,
-        visionRadius: 25
+        size: 10,
+        speed: 2.5,
+        visionRadius: 30
     },
     flashlight: {
-        radius: 120,
         duration: 10000, // 10 seconds
         maxUses: 3
     },
-    lives: 3
+    lives: 3,
+    pathWidth: 35
 };
 
 // Game State
@@ -42,13 +41,15 @@ class Game {
             x: 50,
             y: 50,
             targetX: 50,
-            targetY: 50
+            targetY: 50,
+            lastValidX: 50,
+            lastValidY: 50
         };
 
         this.house = {
             x: 750,
             y: 550,
-            size: 40
+            size: 35
         };
 
         // Generate maze
@@ -62,63 +63,118 @@ class Game {
     }
 
     generateMaze() {
-        // Create a maze structure with paths
+        // Create a more complex maze inspired by the reference images
         this.maze = {
-            paths: [],
-            deadEnds: []
+            correctPath: [],
+            deadEnds: [],
+            allPaths: []
         };
 
-        // Main correct path (simplified wavy path from start to house)
+        // Main correct path - create a winding path from start to house
         const correctPath = [];
-        for (let i = 0; i <= 100; i++) {
-            const progress = i / 100;
-            const x = 50 + progress * 700;
-            const y = 50 + Math.sin(progress * Math.PI * 3) * 200 + progress * 500;
-            correctPath.push({ x, y });
-        }
 
-        // Add dead-end paths
-        const deadEnd1 = [];
-        for (let i = 0; i <= 30; i++) {
-            const progress = i / 30;
-            deadEnd1.push({
-                x: 200 + progress * 150,
-                y: 100 + progress * 200 - Math.sin(progress * Math.PI * 2) * 50
-            });
-        }
+        // Start point
+        let currentX = 50;
+        let currentY = 50;
 
-        const deadEnd2 = [];
-        for (let i = 0; i <= 40; i++) {
-            const progress = i / 40;
-            deadEnd2.push({
-                x: 400 + progress * 100 + Math.cos(progress * Math.PI * 3) * 50,
-                y: 200 + progress * 100
-            });
-        }
+        // Create main path with multiple turns and curves
+        const waypoints = [
+            { x: 50, y: 50 },
+            { x: 150, y: 80 },
+            { x: 250, y: 120 },
+            { x: 320, y: 200 },
+            { x: 400, y: 250 },
+            { x: 480, y: 320 },
+            { x: 550, y: 380 },
+            { x: 620, y: 450 },
+            { x: 700, y: 500 },
+            { x: 750, y: 550 }
+        ];
 
-        const deadEnd3 = [];
-        for (let i = 0; i <= 35; i++) {
-            const progress = i / 35;
-            deadEnd3.push({
-                x: 550 - progress * 150,
-                y: 400 + progress * 150 + Math.sin(progress * Math.PI * 2) * 30
-            });
+        // Interpolate between waypoints to create smooth path
+        for (let i = 0; i < waypoints.length - 1; i++) {
+            const start = waypoints[i];
+            const end = waypoints[i + 1];
+            const steps = 50;
+
+            for (let j = 0; j <= steps; j++) {
+                const t = j / steps;
+                const x = start.x + (end.x - start.x) * t + Math.sin(t * Math.PI * 4) * 15;
+                const y = start.y + (end.y - start.y) * t + Math.cos(t * Math.PI * 3) * 15;
+                correctPath.push({ x, y });
+            }
         }
 
         this.maze.correctPath = correctPath;
-        this.maze.deadEnds = [deadEnd1, deadEnd2, deadEnd3];
+
+        // Generate dead-end paths branching from the main path
+        this.generateDeadEnd([
+            { x: 150, y: 80 },
+            { x: 100, y: 150 },
+            { x: 80, y: 220 },
+            { x: 60, y: 300 }
+        ]);
+
+        this.generateDeadEnd([
+            { x: 250, y: 120 },
+            { x: 300, y: 80 },
+            { x: 380, y: 60 },
+            { x: 450, y: 80 }
+        ]);
+
+        this.generateDeadEnd([
+            { x: 400, y: 250 },
+            { x: 350, y: 350 },
+            { x: 300, y: 420 }
+        ]);
+
+        this.generateDeadEnd([
+            { x: 480, y: 320 },
+            { x: 580, y: 280 },
+            { x: 650, y: 250 },
+            { x: 720, y: 230 }
+        ]);
+
+        this.generateDeadEnd([
+            { x: 620, y: 450 },
+            { x: 550, y: 520 },
+            { x: 480, y: 560 }
+        ]);
+
+        // Compile all valid paths
+        this.maze.allPaths = [this.maze.correctPath, ...this.maze.deadEnds];
+    }
+
+    generateDeadEnd(waypoints) {
+        const deadEnd = [];
+        for (let i = 0; i < waypoints.length - 1; i++) {
+            const start = waypoints[i];
+            const end = waypoints[i + 1];
+            const steps = 30;
+
+            for (let j = 0; j <= steps; j++) {
+                const t = j / steps;
+                const x = start.x + (end.x - start.x) * t + Math.sin(t * Math.PI * 2) * 8;
+                const y = start.y + (end.y - start.y) * t + Math.cos(t * Math.PI * 2) * 8;
+                deadEnd.push({ x, y });
+            }
+        }
+        this.maze.deadEnds.push(deadEnd);
     }
 
     setupEventListeners() {
-        this.canvas.addEventListener('click', (e) => this.handleClick(e));
-        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        document.getElementById('restart-btn').addEventListener('click', () => this.restart());
-    }
+        // Flashlight button click
+        document.getElementById('flashlight-btn').addEventListener('click', () => {
+            if (this.phase === 'WAITING' && this.flashlightUses > 0) {
+                this.startFlashlight();
+            }
+        });
 
-    handleClick(e) {
-        if (this.phase === 'WAITING' && this.flashlightUses > 0) {
-            this.startFlashlight();
-        }
+        // Mouse move for character control
+        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+
+        // Restart button
+        document.getElementById('restart-btn').addEventListener('click', () => this.restart());
     }
 
     handleMouseMove(e) {
@@ -126,7 +182,7 @@ class Game {
         this.mouseX = e.clientX - rect.left;
         this.mouseY = e.clientY - rect.top;
 
-        if (this.phase === 'MOVING') {
+        if (this.phase === 'MOVING' || this.phase === 'MOVING_FINAL') {
             this.character.targetX = this.mouseX;
             this.character.targetY = this.mouseY;
         }
@@ -153,7 +209,7 @@ class Game {
         clearInterval(this.flashlightTimer);
         this.flashlightTimer = null;
 
-        if (this.flashlightUses > 0) {
+        if (this.flashlightUses > 0 || this.lives > 1) {
             this.phase = 'MOVING';
         } else {
             this.phase = 'MOVING_FINAL';
@@ -169,79 +225,87 @@ class Game {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > CONFIG.character.speed) {
-            this.character.x += (dx / distance) * CONFIG.character.speed;
-            this.character.y += (dy / distance) * CONFIG.character.speed;
+            const newX = this.character.x + (dx / distance) * CONFIG.character.speed;
+            const newY = this.character.y + (dy / distance) * CONFIG.character.speed;
 
-            // Check collisions
-            this.checkCollisions();
+            // Check if new position is valid
+            if (this.isOnValidPath(newX, newY)) {
+                this.character.x = newX;
+                this.character.y = newY;
+                this.character.lastValidX = newX;
+                this.character.lastValidY = newY;
+
+                // Check if reached house
+                this.checkWinCondition();
+            } else {
+                // Check if moved off path into nowhere
+                this.checkOffPath(newX, newY);
+            }
         }
     }
 
-    checkCollisions() {
-        // Check if reached house
+    isOnValidPath(x, y) {
+        // Check all paths
+        for (const path of this.maze.allPaths) {
+            for (const point of path) {
+                const dist = Math.sqrt(
+                    Math.pow(x - point.x, 2) +
+                    Math.pow(y - point.y, 2)
+                );
+                if (dist < CONFIG.pathWidth / 2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    checkOffPath(x, y) {
+        // If character tries to move significantly off any path
+        const distFromStart = Math.sqrt(
+            Math.pow(x - 50, 2) +
+            Math.pow(y - 50, 2)
+        );
+
+        // Only check if moved away from start
+        if (distFromStart > 60) {
+            const distFromLast = Math.sqrt(
+                Math.pow(x - this.character.lastValidX, 2) +
+                Math.pow(y - this.character.lastValidY, 2)
+            );
+
+            if (distFromLast > 20) {
+                // Moved off path - check if at dead end
+                this.checkDeadEnd();
+            }
+        }
+    }
+
+    checkDeadEnd() {
+        // Check if at the end of any dead-end path
+        for (const deadEnd of this.maze.deadEnds) {
+            const lastPoint = deadEnd[deadEnd.length - 1];
+            const dist = Math.sqrt(
+                Math.pow(this.character.x - lastPoint.x, 2) +
+                Math.pow(this.character.y - lastPoint.y, 2)
+            );
+
+            if (dist < CONFIG.pathWidth) {
+                // At a dead end!
+                this.loseLife();
+                return;
+            }
+        }
+    }
+
+    checkWinCondition() {
         const distToHouse = Math.sqrt(
             Math.pow(this.character.x - this.house.x, 2) +
             Math.pow(this.character.y - this.house.y, 2)
         );
 
-        if (distToHouse < this.house.size / 2) {
+        if (distToHouse < this.house.size) {
             this.win();
-            return;
-        }
-
-        // Check if on correct path
-        let onCorrectPath = false;
-        for (const point of this.maze.correctPath) {
-            const dist = Math.sqrt(
-                Math.pow(this.character.x - point.x, 2) +
-                Math.pow(this.character.y - point.y, 2)
-            );
-            if (dist < 40) {
-                onCorrectPath = true;
-                break;
-            }
-        }
-
-        // Check if in dead end
-        let inDeadEnd = false;
-        for (const deadEnd of this.maze.deadEnds) {
-            for (const point of deadEnd) {
-                const dist = Math.sqrt(
-                    Math.pow(this.character.x - point.x, 2) +
-                    Math.pow(this.character.y - point.y, 2)
-                );
-                if (dist < 30) {
-                    inDeadEnd = true;
-                    break;
-                }
-            }
-            if (inDeadEnd) break;
-        }
-
-        // If moved significantly and not on any path
-        const distFromStart = Math.sqrt(
-            Math.pow(this.character.x - 50, 2) +
-            Math.pow(this.character.y - 50, 2)
-        );
-
-        if (inDeadEnd && distFromStart > 100) {
-            // Check if at the end of dead end
-            let atDeadEndTip = false;
-            for (const deadEnd of this.maze.deadEnds) {
-                const lastPoint = deadEnd[deadEnd.length - 1];
-                const distToEnd = Math.sqrt(
-                    Math.pow(this.character.x - lastPoint.x, 2) +
-                    Math.pow(this.character.y - lastPoint.y, 2)
-                );
-                if (distToEnd < 30) {
-                    atDeadEndTip = true;
-                    break;
-                }
-            }
-
-            if (atDeadEndTip) {
-                this.loseLife();
-            }
         }
     }
 
@@ -254,6 +318,8 @@ class Game {
         this.character.y = 50;
         this.character.targetX = 50;
         this.character.targetY = 50;
+        this.character.lastValidX = 50;
+        this.character.lastValidY = 50;
 
         if (this.lives <= 0) {
             this.lose();
@@ -261,6 +327,9 @@ class Game {
             // Return to waiting phase if flashlights available
             if (this.flashlightUses > 0) {
                 this.phase = 'WAITING';
+            } else {
+                // No flashlights left but has lives
+                this.lose();
             }
         }
     }
@@ -273,9 +342,9 @@ class Game {
     lose() {
         this.phase = 'LOSE';
         if (this.lives <= 0) {
-            this.showModal('💔 Help Failed', 'The character lost all lives. Better luck next time!');
+            this.showModal('💔 Help Failed', 'The character lost all lives. Try again!');
         } else {
-            this.showModal('🔦 Help Failed', 'You ran out of flashlight uses. The maze remains a mystery!');
+            this.showModal('🔦 Help Failed', 'You ran out of flashlight uses!');
         }
     }
 
@@ -294,6 +363,8 @@ class Game {
         this.character.y = 50;
         this.character.targetX = 50;
         this.character.targetY = 50;
+        this.character.lastValidX = 50;
+        this.character.lastValidY = 50;
         this.flashlightTimeLeft = 0;
         if (this.flashlightTimer) {
             clearInterval(this.flashlightTimer);
@@ -309,84 +380,92 @@ class Game {
         const emptyHearts = Array(CONFIG.lives - this.lives).fill('🖤');
         document.getElementById('lives').textContent = heartsArray.concat(emptyHearts).join('');
 
-        // Update flashlight uses
-        const flashlights = Array(this.flashlightUses).fill('🔦');
-        const usedFlashlights = Array(CONFIG.flashlight.maxUses - this.flashlightUses).fill('🔦');
-        document.getElementById('flashlight-uses').textContent = flashlights.join('') +
-            (usedFlashlights.length > 0 ? '<span style="opacity:0.3">' + usedFlashlights.join('') + '</span>' : '');
-        document.getElementById('flashlight-uses').innerHTML = flashlights.join('') +
-            (usedFlashlights.length > 0 ? '<span style="opacity:0.3">' + usedFlashlights.join('') + '</span>' : '');
+        // Update flashlight button
+        const flashlightBtn = document.getElementById('flashlight-btn');
+        const flashlightCount = document.getElementById('flashlight-count');
+        flashlightCount.textContent = `(${this.flashlightUses} left)`;
 
-        // Update phase
+        if (this.flashlightUses === 0 || this.phase === 'FLASHLIGHT') {
+            flashlightBtn.disabled = true;
+        } else {
+            flashlightBtn.disabled = false;
+        }
+
+        // Update phase text
         const phaseEl = document.getElementById('phase');
         switch (this.phase) {
             case 'WAITING':
-                phaseEl.textContent = '🔦 Click to use flashlight!';
+                phaseEl.textContent = '🔦 Click flashlight button!';
                 break;
             case 'FLASHLIGHT':
                 const secondsLeft = Math.ceil(this.flashlightTimeLeft / 1000);
-                phaseEl.textContent = `👀 Flashlight active: ${secondsLeft}s`;
+                phaseEl.textContent = `👀 Flashlight: ${secondsLeft}s`;
                 break;
             case 'MOVING':
-                phaseEl.textContent = '🖱️ Move mouse to guide character';
+                phaseEl.textContent = '🖱️ Guide with mouse';
                 break;
             case 'MOVING_FINAL':
-                phaseEl.textContent = '⚠️ Final attempt - no flashlights left!';
+                phaseEl.textContent = '⚠️ Last chance!';
                 break;
         }
     }
 
     drawMaze() {
-        // Draw correct path
+        // Only draw maze during flashlight phase
+        if (this.phase !== 'FLASHLIGHT') {
+            return;
+        }
+
         this.ctx.strokeStyle = CONFIG.colors.path;
-        this.ctx.lineWidth = 40;
+        this.ctx.lineWidth = CONFIG.pathWidth;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
 
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.maze.correctPath[0].x, this.maze.correctPath[0].y);
-        for (let i = 1; i < this.maze.correctPath.length; i++) {
-            this.ctx.lineTo(this.maze.correctPath[i].x, this.maze.correctPath[i].y);
-        }
-        this.ctx.stroke();
-
-        // Draw dead ends
-        for (const deadEnd of this.maze.deadEnds) {
+        // Draw all paths (correct and dead ends)
+        for (const path of this.maze.allPaths) {
             this.ctx.beginPath();
-            this.ctx.moveTo(deadEnd[0].x, deadEnd[0].y);
-            for (let i = 1; i < deadEnd.length; i++) {
-                this.ctx.lineTo(deadEnd[i].x, deadEnd[i].y);
+            this.ctx.moveTo(path[0].x, path[0].y);
+            for (let i = 1; i < path.length; i++) {
+                this.ctx.lineTo(path[i].x, path[i].y);
             }
             this.ctx.stroke();
         }
     }
 
     drawHouse() {
-        // Draw house
-        this.ctx.fillStyle = CONFIG.colors.house;
-        this.ctx.fillRect(
-            this.house.x - this.house.size / 2,
-            this.house.y - this.house.size / 2,
-            this.house.size,
-            this.house.size * 0.7
+        // Only draw house during flashlight phase or if character is near
+        const distToHouse = Math.sqrt(
+            Math.pow(this.character.x - this.house.x, 2) +
+            Math.pow(this.character.y - this.house.y, 2)
         );
 
-        // Draw roof
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.house.x - this.house.size / 2 - 5, this.house.y - this.house.size / 2);
-        this.ctx.lineTo(this.house.x, this.house.y - this.house.size / 2 - 20);
-        this.ctx.lineTo(this.house.x + this.house.size / 2 + 5, this.house.y - this.house.size / 2);
-        this.ctx.closePath();
-        this.ctx.fill();
+        if (this.phase === 'FLASHLIGHT' || distToHouse < CONFIG.character.visionRadius + 20) {
+            // Draw house base
+            this.ctx.fillStyle = CONFIG.colors.house;
+            this.ctx.fillRect(
+                this.house.x - this.house.size / 2,
+                this.house.y - this.house.size / 2,
+                this.house.size,
+                this.house.size * 0.7
+            );
 
-        // Draw door
-        this.ctx.fillStyle = '#654321';
-        this.ctx.fillRect(
-            this.house.x - 8,
-            this.house.y,
-            16,
-            20
-        );
+            // Draw roof
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.house.x - this.house.size / 2 - 5, this.house.y - this.house.size / 2);
+            this.ctx.lineTo(this.house.x, this.house.y - this.house.size / 2 - 20);
+            this.ctx.lineTo(this.house.x + this.house.size / 2 + 5, this.house.y - this.house.size / 2);
+            this.ctx.closePath();
+            this.ctx.fill();
+
+            // Draw door
+            this.ctx.fillStyle = '#654321';
+            this.ctx.fillRect(
+                this.house.x - 8,
+                this.house.y,
+                16,
+                20
+            );
+        }
     }
 
     drawCharacter() {
@@ -399,63 +478,41 @@ class Game {
         // Draw eyes
         this.ctx.fillStyle = '#000';
         this.ctx.beginPath();
-        this.ctx.arc(this.character.x - 4, this.character.y - 3, 2, 0, Math.PI * 2);
-        this.ctx.arc(this.character.x + 4, this.character.y - 3, 2, 0, Math.PI * 2);
+        this.ctx.arc(this.character.x - 3, this.character.y - 2, 1.5, 0, Math.PI * 2);
+        this.ctx.arc(this.character.x + 3, this.character.y - 2, 1.5, 0, Math.PI * 2);
         this.ctx.fill();
     }
 
-    drawClouds() {
-        if (this.phase === 'FLASHLIGHT') {
-            // Draw flashlight effect
-            this.ctx.save();
-
-            // Create clipping region (inverse of flashlight)
-            this.ctx.globalCompositeOperation = 'source-over';
-            this.ctx.fillStyle = CONFIG.colors.clouds;
+    drawDarkClouds() {
+        if (this.phase === 'WAITING' || this.phase === 'WIN' || this.phase === 'LOSE') {
+            // Full dark cloud cover
+            this.ctx.fillStyle = CONFIG.colors.darkClouds;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // Clear flashlight area
-            this.ctx.globalCompositeOperation = 'destination-out';
-            const gradient = this.ctx.createRadialGradient(
-                this.mouseX, this.mouseY, 0,
-                this.mouseX, this.mouseY, CONFIG.flashlight.radius
-            );
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-            this.ctx.fillStyle = gradient;
-            this.ctx.beginPath();
-            this.ctx.arc(this.mouseX, this.mouseY, CONFIG.flashlight.radius, 0, Math.PI * 2);
-            this.ctx.fill();
-
-            this.ctx.restore();
         } else if (this.phase === 'MOVING' || this.phase === 'MOVING_FINAL') {
-            // Draw clouds everywhere
-            this.ctx.fillStyle = CONFIG.colors.clouds;
+            // Dark clouds everywhere
+            this.ctx.fillStyle = CONFIG.colors.darkClouds;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
             // Clear small area around character
             this.ctx.save();
             this.ctx.globalCompositeOperation = 'destination-out';
+
             const gradient = this.ctx.createRadialGradient(
                 this.character.x, this.character.y, 0,
                 this.character.x, this.character.y, CONFIG.character.visionRadius
             );
             gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.5)');
+            gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.8)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
             this.ctx.fillStyle = gradient;
             this.ctx.beginPath();
             this.ctx.arc(this.character.x, this.character.y, CONFIG.character.visionRadius, 0, Math.PI * 2);
             this.ctx.fill();
+
             this.ctx.restore();
-        } else if (this.phase === 'WAITING') {
-            // Full cloud cover
-            this.ctx.fillStyle = CONFIG.colors.clouds;
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
+        // Note: During FLASHLIGHT phase, no dark clouds are drawn so maze is visible
     }
 
     render() {
@@ -463,21 +520,21 @@ class Game {
         this.ctx.fillStyle = CONFIG.colors.background;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw maze
+        // Draw maze (only visible during flashlight phase)
         this.drawMaze();
 
-        // Draw house
+        // Draw house (only visible during flashlight or when near)
         this.drawHouse();
 
         // Draw character
         this.drawCharacter();
 
-        // Draw clouds (fog of war)
-        this.drawClouds();
+        // Draw dark clouds (fog of war)
+        this.drawDarkClouds();
 
-        // If game is over, darken screen slightly
+        // If game is over, add extra darkness
         if (this.phase === 'WIN' || this.phase === 'LOSE') {
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
     }
