@@ -1,0 +1,184 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background-color: #000;
+    color: #f5f5dc;
+    overflow: hidden;
+    cursor: default;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #000;
+}
+
+.screen.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ornate Frame for Start/End Screens */
+.ornate-frame {
+    border: 8px solid #f5f5dc;
+    border-radius: 20px;
+    padding: 60px 80px;
+    position: relative;
+    text-align: center;
+    background-color: #000;
+    box-shadow: 0 0 30px rgba(245, 245, 220, 0.3);
+}
+
+.ornate-frame::before,
+.ornate-frame::after {
+    content: '';
+    position: absolute;
+    border: 2px solid #f5f5dc;
+    border-radius: 15px;
+}
+
+.ornate-frame::before {
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}
+
+.game-title {
+    font-size: 48px;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    color: #f5f5dc;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 18px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+    color: #f5f5dc;
+}
+
+.start-button {
+    background-color: transparent;
+    color: #f5f5dc;
+    border: 3px solid #f5f5dc;
+    padding: 15px 40px;
+    font-size: 22px;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+}
+
+.start-button:hover {
+    background-color: #f5f5dc;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Game Screen */
+#gameScreen {
+    display: none;
+    flex-direction: column;
+}
+
+#gameScreen.active {
+    display: flex;
+}
+
+/* Game UI */
+.game-ui {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #000;
+    border-bottom: 2px solid #f5f5dc;
+}
+
+.lives, .flashlights {
+    display: flex;
+    gap: 15px;
+    font-size: 32px;
+}
+
+.heart {
+    color: #f5f5dc;
+    transition: opacity 0.3s;
+}
+
+.heart.lost {
+    opacity: 0.2;
+}
+
+.flashlight {
+    transition: opacity 0.3s;
+}
+
+.flashlight.used {
+    opacity: 0.2;
+}
+
+.timer {
+    font-size: 48px;
+    font-weight: bold;
+    color: #f5f5dc;
+    letter-spacing: 2px;
+}
+
+/* Canvas */
+#gameCanvas {
+    flex: 1;
+    background-color: #000;
+    cursor: none;
+}
+
+/* Message Overlay */
+.message-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.message-overlay.hidden {
+    display: none;
+}
+
+.message-content {
+    text-align: center;
+}
+
+.message-content p {
+    font-size: 42px;
+    color: #f5f5dc;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+/* Goal Icon */
+.goal-icon {
+    position: absolute;
+    font-size: 32px;
+    pointer-events: none;
+    z-index: 10;
+    display: none;
+}
