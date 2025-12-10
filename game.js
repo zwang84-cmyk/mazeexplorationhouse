@@ -28,25 +28,33 @@ let gameState = {
     hasReachedGoal: false
 };
 
-// Canvas Setup
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-
-// Elements
-const startScreen = document.getElementById('startScreen');
-const gameScreen = document.getElementById('gameScreen');
-const failureScreen = document.getElementById('failureScreen');
-const successScreen = document.getElementById('successScreen');
-const messageOverlay = document.getElementById('messageOverlay');
-const messageText = document.getElementById('messageText');
-const timerDisplay = document.querySelector('.timer');
-const goalIcon = document.getElementById('goalIcon');
+// Canvas and DOM Elements (will be initialized after DOM loads)
+let canvas, ctx;
+let startScreen, gameScreen, failureScreen, successScreen;
+let messageOverlay, messageText, timerDisplay, goalIcon;
 
 // Timer Interval
 let timerInterval = null;
 
+// Initialize DOM elements
+function initializeElements() {
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    startScreen = document.getElementById('startScreen');
+    gameScreen = document.getElementById('gameScreen');
+    failureScreen = document.getElementById('failureScreen');
+    successScreen = document.getElementById('successScreen');
+    messageOverlay = document.getElementById('messageOverlay');
+    messageText = document.getElementById('messageText');
+    timerDisplay = document.querySelector('.timer');
+    goalIcon = document.getElementById('goalIcon');
+}
+
 // Initialize
 function init() {
+    // Initialize all DOM elements first
+    initializeElements();
+
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
@@ -629,5 +637,10 @@ function handleClick(e) {
     }
 }
 
-// Start
-init();
+// Start when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    // DOM is already loaded
+    init();
+}
