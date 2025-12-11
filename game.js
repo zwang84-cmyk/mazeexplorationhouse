@@ -1,14 +1,14 @@
-// Game Configuration
+// Game Configuration - Optimized for Desktop
 const CONFIG = {
-    CELL_SIZE: 40,
-    WALL_WIDTH: 3,
-    FLASHLIGHT_RADIUS: 100,
+    CELL_SIZE: 50, // Increased for better desktop visibility
+    WALL_WIDTH: 4, // Thicker walls for desktop
+    FLASHLIGHT_RADIUS: 120, // Larger flashlight radius for desktop
     FLASHLIGHT_DURATION: 10, // seconds
-    PLAYER_RADIUS: 10,
-    PLAYER_VISION_RADIUS: 60,
-    PLAYER_SPEED: 4, // Increased for more responsive movement
-    MAZE_COLS: 15,
-    MAZE_ROWS: 11,
+    PLAYER_RADIUS: 12, // Slightly larger player
+    PLAYER_VISION_RADIUS: 70, // Larger vision radius for desktop
+    PLAYER_SPEED: 4.5, // Optimized for desktop movement
+    MAZE_COLS: 13, // Adjusted for better desktop aspect ratio
+    MAZE_ROWS: 9, // Adjusted for better desktop aspect ratio
     MAX_LIVES: 3,
     MAX_FLASHLIGHTS: 3
 };
@@ -60,6 +60,26 @@ window.addEventListener('DOMContentLoaded', () => {
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    // Recalculate maze offset if game is in progress
+    if (gameState.maze && gameState.phase !== 'start') {
+        const mazeWidth = CONFIG.MAZE_COLS * CONFIG.CELL_SIZE;
+        const mazeHeight = CONFIG.MAZE_ROWS * CONFIG.CELL_SIZE;
+        const oldOffsetX = gameState.mazeOffsetX;
+        const oldOffsetY = gameState.mazeOffsetY;
+
+        gameState.mazeOffsetX = (canvas.width - mazeWidth) / 2;
+        gameState.mazeOffsetY = (canvas.height - mazeHeight) / 2;
+
+        // Adjust player and goal positions by the offset difference
+        const deltaX = gameState.mazeOffsetX - oldOffsetX;
+        const deltaY = gameState.mazeOffsetY - oldOffsetY;
+
+        gameState.player.x += deltaX;
+        gameState.player.y += deltaY;
+        gameState.goal.x += deltaX;
+        gameState.goal.y += deltaY;
+    }
 }
 
 // Screen Management
@@ -95,14 +115,15 @@ function generateMaze() {
 
     // Recursive backtracking to create paths
     const stack = [];
-    let current = { row: 0, col: 0 };
-    maze[0][0].visited = true;
+    // Start from bottom-left corner
+    let current = { row: rows - 1, col: 0 };
+    maze[rows - 1][0].visited = true;
     let visitedCount = 1;
     const totalCells = rows * cols;
 
     // Store the path from start to end for the correct route
     const correctPath = [];
-    correctPath.push({ row: 0, col: 0 });
+    correctPath.push({ row: rows - 1, col: 0 });
 
     while (visitedCount < totalCells) {
         const neighbors = getUnvisitedNeighbors(current, maze, rows, cols);
@@ -189,9 +210,9 @@ function removeWall(current, next, maze) {
 }
 
 function markCorrectPath(maze, rows, cols) {
-    // Use BFS to find path from (0,0) to (rows-1, cols-1)
-    const start = { row: 0, col: 0 };
-    const end = { row: rows - 1, col: cols - 1 };
+    // Use BFS to find path from bottom-left (rows-1, 0) to top-right (0, cols-1)
+    const start = { row: rows - 1, col: 0 };
+    const end = { row: 0, col: cols - 1 };
 
     const queue = [start];
     const visited = new Set();
@@ -277,14 +298,16 @@ function startGame() {
     gameState.mazeOffsetX = (canvas.width - mazeWidth) / 2;
     gameState.mazeOffsetY = (canvas.height - mazeHeight) / 2;
 
-    // Set player at start position (top-left)
-    const startX = gameState.mazeOffsetX + CONFIG.CELL_SIZE / 2;
-    const startY = gameState.mazeOffsetY + CONFIG.CELL_SIZE / 2;
+    // Set player at start position (bottom-left corner of maze)
+    const startCol = 0;
+    const startRow = CONFIG.MAZE_ROWS - 1;
+    const startX = gameState.mazeOffsetX + startCol * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2;
+    const startY = gameState.mazeOffsetY + startRow * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2;
     gameState.player = { x: startX, y: startY };
 
-    // Set goal at end position (bottom-right)
+    // Set goal at end position (top-right corner of maze)
     const goalCol = CONFIG.MAZE_COLS - 1;
-    const goalRow = CONFIG.MAZE_ROWS - 1;
+    const goalRow = 0;
     gameState.goal = {
         x: gameState.mazeOffsetX + goalCol * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2,
         y: gameState.mazeOffsetY + goalRow * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2
@@ -348,10 +371,12 @@ function handleWrongPath() {
     } else {
         // Show message and reset to flashlight phase
         showMessage("You take the wrong way", () => {
-            // Reset player position
+            // Reset player position to bottom-left corner
+            const startCol = 0;
+            const startRow = CONFIG.MAZE_ROWS - 1;
             gameState.player = {
-                x: gameState.mazeOffsetX + CONFIG.CELL_SIZE / 2,
-                y: gameState.mazeOffsetY + CONFIG.CELL_SIZE / 2
+                x: gameState.mazeOffsetX + startCol * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2,
+                y: gameState.mazeOffsetY + startRow * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2
             };
             resetToFlashlight();
         });

@@ -135,70 +135,78 @@ body {
     cursor: crosshair;
 }
 
-/* HUD */
+/* HUD - Optimized for Desktop */
 .hud {
     position: absolute;
-    top: 20px;
+    top: 30px;
     left: 0;
     right: 0;
     display: flex;
     justify-content: space-between;
-    padding: 0 30px;
+    padding: 0 50px;
     z-index: 10;
     pointer-events: none;
+    user-select: none;
 }
 
-/* Lives */
+/* Lives - Desktop Optimized */
 .lives {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .heart {
-    font-size: 28px;
+    font-size: 32px;
     color: #fff;
     transition: opacity 0.3s ease;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
 }
 
 .heart.empty {
     opacity: 0.2;
+    filter: none;
 }
 
-/* Flashlights */
+/* Flashlights - Desktop Optimized */
 .flashlights {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .flashlight-icon {
-    font-size: 24px;
+    font-size: 28px;
     transition: opacity 0.3s ease;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
 }
 
 .flashlight-icon.used {
     opacity: 0.2;
+    filter: none;
 }
 
-/* Timer */
+/* Timer - Desktop Optimized */
 .timer {
-    font-size: 24px;
+    font-size: 28px;
     font-family: 'Courier New', monospace;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-/* Home Icon */
+/* Home Icon - Desktop Optimized */
 .home-icon {
     position: absolute;
-    top: 50px;
-    right: 30px;
-    font-size: 28px;
+    top: 90px;
+    right: 50px;
+    font-size: 32px;
     cursor: pointer;
     z-index: 10;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
 }
 
 .home-icon:hover {
-    transform: scale(1.2);
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
 }
 
 /* Message Overlay */
