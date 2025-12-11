@@ -6,7 +6,7 @@ const CONFIG = {
     FLASHLIGHT_DURATION: 10, // seconds
     PLAYER_RADIUS: 10,
     PLAYER_VISION_RADIUS: 60,
-    PLAYER_SPEED: 3,
+    PLAYER_SPEED: 4, // Increased for more responsive movement
     MAZE_COLS: 15,
     MAZE_ROWS: 11,
     MAX_LIVES: 3,
@@ -24,7 +24,9 @@ const gameState = {
     goal: { x: 0, y: 0 },
     mousePos: { x: 0, y: 0 },
     revealedCells: new Set(),
-    timerInterval: null
+    timerInterval: null,
+    mazeOffsetX: 0,
+    mazeOffsetY: 0
 };
 
 // Canvas and Context
@@ -269,17 +271,23 @@ function startGame() {
     gameState.lives = CONFIG.MAX_LIVES;
     gameState.flashlightsRemaining = CONFIG.MAX_FLASHLIGHTS;
 
+    // Calculate maze offset to center it on screen
+    const mazeWidth = CONFIG.MAZE_COLS * CONFIG.CELL_SIZE;
+    const mazeHeight = CONFIG.MAZE_ROWS * CONFIG.CELL_SIZE;
+    gameState.mazeOffsetX = (canvas.width - mazeWidth) / 2;
+    gameState.mazeOffsetY = (canvas.height - mazeHeight) / 2;
+
     // Set player at start position (top-left)
-    const startX = CONFIG.CELL_SIZE / 2;
-    const startY = CONFIG.CELL_SIZE / 2;
+    const startX = gameState.mazeOffsetX + CONFIG.CELL_SIZE / 2;
+    const startY = gameState.mazeOffsetY + CONFIG.CELL_SIZE / 2;
     gameState.player = { x: startX, y: startY };
 
     // Set goal at end position (bottom-right)
     const goalCol = CONFIG.MAZE_COLS - 1;
     const goalRow = CONFIG.MAZE_ROWS - 1;
     gameState.goal = {
-        x: goalCol * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2,
-        y: goalRow * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2
+        x: gameState.mazeOffsetX + goalCol * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2,
+        y: gameState.mazeOffsetY + goalRow * CONFIG.CELL_SIZE + CONFIG.CELL_SIZE / 2
     };
 
     updateHUD();
@@ -342,8 +350,8 @@ function handleWrongPath() {
         showMessage("You take the wrong way", () => {
             // Reset player position
             gameState.player = {
-                x: CONFIG.CELL_SIZE / 2,
-                y: CONFIG.CELL_SIZE / 2
+                x: gameState.mazeOffsetX + CONFIG.CELL_SIZE / 2,
+                y: gameState.mazeOffsetY + CONFIG.CELL_SIZE / 2
             };
             resetToFlashlight();
         });
@@ -370,15 +378,15 @@ function showMessage(text, callback) {
 
 // Player Movement
 function handleMouseMove(e) {
+    // Just update mouse position, actual movement happens in updatePlayerMovement
+}
+
+function updatePlayerMovement() {
     if (gameState.phase !== 'movement') return;
 
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
     // Calculate direction to mouse
-    const dx = mouseX - gameState.player.x;
-    const dy = mouseY - gameState.player.y;
+    const dx = gameState.mousePos.x - gameState.player.x;
+    const dy = gameState.mousePos.y - gameState.player.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance > 5) {
@@ -407,8 +415,8 @@ function handleMouseMove(e) {
 
             // Check if in dead end
             const playerCell = {
-                row: Math.floor(gameState.player.y / CONFIG.CELL_SIZE),
-                col: Math.floor(gameState.player.x / CONFIG.CELL_SIZE)
+                row: Math.floor((gameState.player.y - gameState.mazeOffsetY) / CONFIG.CELL_SIZE),
+                col: Math.floor((gameState.player.x - gameState.mazeOffsetX) / CONFIG.CELL_SIZE)
             };
 
             if (playerCell.row >= 0 && playerCell.row < CONFIG.MAZE_ROWS &&
@@ -428,8 +436,8 @@ function handleCanvasClick(e) {
 }
 
 function canMoveTo(x, y) {
-    const cellCol = Math.floor(x / CONFIG.CELL_SIZE);
-    const cellRow = Math.floor(y / CONFIG.CELL_SIZE);
+    const cellCol = Math.floor((x - gameState.mazeOffsetX) / CONFIG.CELL_SIZE);
+    const cellRow = Math.floor((y - gameState.mazeOffsetY) / CONFIG.CELL_SIZE);
 
     // Check bounds
     if (cellRow < 0 || cellRow >= CONFIG.MAZE_ROWS ||
@@ -440,8 +448,8 @@ function canMoveTo(x, y) {
     const cell = gameState.maze[cellRow][cellCol];
 
     // Check wall collisions
-    const cellX = cellCol * CONFIG.CELL_SIZE;
-    const cellY = cellRow * CONFIG.CELL_SIZE;
+    const cellX = gameState.mazeOffsetX + cellCol * CONFIG.CELL_SIZE;
+    const cellY = gameState.mazeOffsetY + cellRow * CONFIG.CELL_SIZE;
     const margin = CONFIG.PLAYER_RADIUS;
 
     // Top wall
@@ -462,6 +470,7 @@ function gameLoop() {
         renderFlashlightPhase();
         requestAnimationFrame(gameLoop);
     } else if (gameState.phase === 'movement') {
+        updatePlayerMovement();
         renderMovementPhase();
         requestAnimationFrame(gameLoop);
     }
@@ -471,6 +480,20 @@ function renderFlashlightPhase() {
     // Clear canvas with black
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw starting position (player icon) - always visible
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.font = '20px Arial';
+    ctx.fillText('🚶', gameState.player.x - 10, gameState.player.y + 7);
+    ctx.restore();
+
+    // Draw goal (house icon) - always visible
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.font = '24px Arial';
+    ctx.fillText('🏠', gameState.goal.x - 12, gameState.goal.y + 8);
+    ctx.restore();
 
     // Create circular clipping region for flashlight
     ctx.save();
@@ -550,8 +573,8 @@ function drawMaze() {
     for (let row = 0; row < CONFIG.MAZE_ROWS; row++) {
         for (let col = 0; col < CONFIG.MAZE_COLS; col++) {
             const cell = gameState.maze[row][col];
-            const x = col * CONFIG.CELL_SIZE;
-            const y = row * CONFIG.CELL_SIZE;
+            const x = gameState.mazeOffsetX + col * CONFIG.CELL_SIZE;
+            const y = gameState.mazeOffsetY + row * CONFIG.CELL_SIZE;
 
             // Draw walls
             ctx.beginPath();
