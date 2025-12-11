@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labyrinth of Shadows</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen active">
+        <div class="ornate-border">
+            <h1 class="game-title">LABYRINTH OF SHADOWS</h1>
+            <p class="subtitle">You have 3 chances to use the flashlight.<br>You have 3 lives.</p>
+            <button id="startBtn" class="start-button">Start Exploration</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <!-- HUD -->
+        <div class="hud">
+            <!-- Lives -->
+            <div class="lives">
+                <span class="heart filled" data-life="1">♥</span>
+                <span class="heart filled" data-life="2">♥</span>
+                <span class="heart filled" data-life="3">♥</span>
+            </div>
+
+            <!-- Flashlights -->
+            <div class="flashlights">
+                <span class="flashlight-icon" data-flashlight="1">🔦</span>
+                <span class="flashlight-icon" data-flashlight="2">🔦</span>
+                <span class="flashlight-icon" data-flashlight="3">🔦</span>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer">00:<span id="timerSeconds">10</span></div>
+        </div>
+
+        <!-- Home Icon -->
+        <div class="home-icon" id="homeIcon">🏠</div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Message Overlay -->
+        <div id="messageOverlay" class="message-overlay">
+            <div class="message-box">
+                <p id="messageText"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Failure Screen -->
+    <div id="failureScreen" class="screen">
+        <div class="ornate-border">
+            <h1 class="game-title">You failed</h1>
+            <button id="restartBtn" class="start-button">Start Over</button>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="successScreen" class="screen">
+        <div class="ornate-border">
+            <h1 class="game-title">You take the right way!</h1>
+            <p class="subtitle">Congratulations!</p>
+            <button id="playAgainBtn" class="start-button">Play Again</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.screen.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ornate Border */
+.ornate-border {
+    border: 3px solid #fff;
+    padding: 60px 80px;
+    position: relative;
+    text-align: center;
+    background-color: #000;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.ornate-border::before,
+.ornate-border::after {
+    content: '';
+    position: absolute;
+    border: 1px solid #fff;
+}
+
+.ornate-border::before {
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}
+
+.ornate-border::after {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+}
+
+/* Corner decorations */
+.ornate-border {
+    background-image:
+        linear-gradient(to right, #fff 2px, transparent 2px),
+        linear-gradient(to bottom, #fff 2px, transparent 2px),
+        linear-gradient(to right, #fff 2px, transparent 2px),
+        linear-gradient(to bottom, #fff 2px, transparent 2px);
+    background-size: 30px 2px, 2px 30px, 30px 2px, 2px 30px;
+    background-position:
+        top left,
+        top left,
+        bottom right,
+        bottom right;
+    background-repeat: no-repeat;
+}
+
+/* Typography */
+.game-title {
+    font-size: 48px;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    font-weight: normal;
+    position: relative;
+    z-index: 1;
+}
+
+.subtitle {
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+}
+
+/* Buttons */
+.start-button {
+    background-color: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+}
+
+.start-button:hover {
+    background-color: #fff;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.start-button:active {
+    transform: scale(0.98);
+}
+
+/* Game Screen */
+#gameScreen {
+    background-color: #000;
+    position: relative;
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: none;
+}
+
+/* HUD */
+.hud {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Lives */
+.lives {
+    display: flex;
+    gap: 10px;
+}
+
+.heart {
+    font-size: 28px;
+    color: #fff;
+    transition: opacity 0.3s ease;
+}
+
+.heart.empty {
+    opacity: 0.2;
+}
+
+/* Flashlights */
+.flashlights {
+    display: flex;
+    gap: 10px;
+}
+
+.flashlight-icon {
+    font-size: 24px;
+    transition: opacity 0.3s ease;
+}
+
+.flashlight-icon.used {
+    opacity: 0.2;
+}
+
+/* Timer */
+.timer {
+    font-size: 24px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+/* Home Icon */
+.home-icon {
+    position: absolute;
+    top: 50px;
+    right: 30px;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s ease;
+}
+
+.home-icon:hover {
+    transform: scale(1.2);
+}
+
+/* Message Overlay */
+.message-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.message-overlay.active {
+    display: flex;
+}
+
+.message-box {
+    background-color: #000;
+    border: 3px solid #fff;
+    padding: 40px 60px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+.message-box p {
+    font-size: 28px;
+    letter-spacing: 2px;
+}
+
+/* Failure Screen */
+#failureScreen .ornate-border {
+    min-width: 500px;
+}
+
+/* Success Screen */
+#successScreen .ornate-border {
+    min-width: 500px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ornate-border {
+        padding: 40px 50px;
+    }
+
+    .game-title {
+        font-size: 32px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+}
