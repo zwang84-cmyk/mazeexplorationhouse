@@ -68,11 +68,11 @@
     </div>
 
     <div id="canvas-container">
-        <canvas id="gameCanvas" width="900" height="900"></canvas>
+        <canvas id="gameCanvas" width="960" height="544"></canvas>
     </div>
 
     <div id="controls">
-        <p>Dead ends will flash red when triggered | Reach the exit (bottom-right)</p>
+        <p>Dead ends will flash red when triggered | Reach the exit</p>
     </div>
 
     <script>
@@ -84,238 +84,237 @@
         const ctx = canvas.getContext('2d');
         const layerIndicator = document.getElementById('layer-indicator');
 
-        // Configuration
-        const GRID_SIZE = 30;
-        const CELL_SIZE = 30;
-        const MAZE_WIDTH = GRID_SIZE * CELL_SIZE; // 900px
-        const MAZE_HEIGHT = GRID_SIZE * CELL_SIZE; // 900px
+        // Configuration - Layer 1 is rectangular (16:9 ratio)
+        const CELL_SIZE = 32;
+        const GRID_WIDTH_L1 = 30;
+        const GRID_HEIGHT_L1 = 17;
+        const GRID_SIZE_L2 = 17;
         const PLAYER_RADIUS = 6;
 
         // Game state
         let currentLayer = 1;
         let playerX = 1;
-        let playerY = 28; // Layer 1 starts at bottom-left
+        let playerY = 15;
         let flashTimer = 0;
         let isFlashing = false;
-        const FLASH_DURATION = 12; // frames (~0.2 seconds at 60fps)
+        const FLASH_DURATION = 12;
 
         // Key states
-        const keys = {
-            w: false,
-            a: false,
-            s: false,
-            d: false
-        };
+        const keys = { w: false, a: false, s: false, d: false };
 
         // Movement cooldown
         let moveCooldown = 0;
-        const MOVE_DELAY = 8; // frames between moves
+        const MOVE_DELAY = 8;
 
         // =====================================================
-        // MAZE DEFINITIONS
+        // LAYER 1 MAZE - Rectangular, Single-Solution
+        // Start: (1,15) bottom-left | Exit: (26,1) upper-right
         // =====================================================
-        // 0 = path, 1 = wall, 2 = dead-end trigger zone
-
-        // Layer 1 Maze - Bordered with clear structure
-        const maze1 = createMaze1();
-
-        // Layer 2 Maze - Different layout for "endless" feel
-        const maze2 = createMaze2();
 
         function createMaze1() {
-            // Initialize with all walls
             const maze = [];
-            for (let y = 0; y < GRID_SIZE; y++) {
+            for (let y = 0; y < GRID_HEIGHT_L1; y++) {
                 maze[y] = [];
-                for (let x = 0; x < GRID_SIZE; x++) {
-                    maze[y][x] = 1; // wall
+                for (let x = 0; x < GRID_WIDTH_L1; x++) {
+                    maze[y][x] = 1;
                 }
             }
 
-            // Complex maze: Start at (1,28) bottom-left, Exit at (22,5) upper-right near center
-            // The path winds extensively with many turns to obscure the correct route
-            const paths = [
-                // === MAIN SOLUTION PATH (very long and winding) ===
-                // Start area - bottom left
-                [1,28], [1,27], [1,26], [1,25], [1,24],
-                [2,24], [3,24], [4,24], [5,24],
-                [5,25], [5,26], [5,27], [5,28],
-                [6,28], [7,28], [8,28], [9,28],
-                [9,27], [9,26], [9,25], [9,24], [9,23], [9,22],
-                [10,22], [11,22], [12,22], [13,22],
-                [13,23], [13,24], [13,25], [13,26],
-                [14,26], [15,26], [16,26], [17,26],
-                [17,25], [17,24], [17,23], [17,22], [17,21], [17,20],
-                [16,20], [15,20], [14,20], [13,20],
-                [13,19], [13,18], [13,17], [13,16],
-                [12,16], [11,16], [10,16], [9,16],
-                [9,15], [9,14], [9,13], [9,12],
-                [10,12], [11,12], [12,12], [13,12],
-                [13,11], [13,10], [13,9], [13,8],
-                [12,8], [11,8], [10,8], [9,8], [8,8], [7,8], [6,8], [5,8],
-                [5,7], [5,6], [5,5], [5,4],
-                [6,4], [7,4], [8,4], [9,4], [10,4], [11,4],
-                [11,5], [11,6], [11,7],
-                [12,7], [13,7], [14,7], [15,7],
-                [15,6], [15,5], [15,4], [15,3],
-                [16,3], [17,3], [18,3], [19,3],
-                [19,4], [19,5], [19,6], [19,7],
-                [20,7], [21,7], [22,7],
-                [22,6], [22,5], // EXIT
-
-                // === DEAD END 1 - Branches from start area going left ===
-                [1,23], [1,22], [1,21], [1,20], [1,19],
-
-                // === DEAD END 2 - False path from (5,24) going up early ===
-                [5,23], [5,22], [5,21], [5,20], [5,19], [5,18],
-                [4,18], [3,18], [2,18], [1,18],
-
-                // === DEAD END 3 - Branch from (9,22) going right ===
-                [14,22], [15,22], [16,22], [17,22],
-                [18,22], [19,22], [20,22], [21,22],
-                [21,23], [21,24], [21,25], [21,26], [21,27], [21,28],
-
-                // === DEAD END 4 - Branch from (13,16) going left ===
-                [8,16], [7,16], [6,16], [5,16],
-                [5,15], [5,14], [5,13], [5,12], [5,11], [5,10],
-
-                // === DEAD END 5 - Branch at (5,8) going down ===
-                [5,9], [5,10], [4,10], [3,10], [2,10], [1,10],
-                [1,11], [1,12], [1,13], [1,14], [1,15], [1,16],
-
-                // === DEAD END 6 - False exit path from (19,3) going up ===
-                [19,2], [19,1],
-                [20,1], [21,1], [22,1], [23,1], [24,1], [25,1],
-                [25,2], [25,3], [25,4], [25,5],
-
-                // === DEAD END 7 - Branch from (22,7) continuing right ===
-                [23,7], [24,7], [25,7], [26,7], [27,7], [28,7],
-                [28,6], [28,5], [28,4], [28,3], [28,2], [28,1],
-
-                // === MISLEADING CORRIDORS (look like main paths) ===
-
-                // Large false network in bottom-right
-                [21,28], [22,28], [23,28], [24,28], [25,28],
-                [25,27], [25,26], [25,25], [25,24], [25,23], [25,22],
-                [24,22], [23,22], [22,22],
-                [25,21], [25,20], [25,19], [25,18],
-                [26,18], [27,18], [28,18],
-                [28,19], [28,20], [28,21], [28,22], [28,23], [28,24], [28,25], [28,26], [28,27], [28,28],
-
-                // False path in middle area
-                [17,16], [18,16], [19,16], [20,16], [21,16],
-                [21,15], [21,14], [21,13], [21,12], [21,11], [21,10],
-                [20,10], [19,10], [18,10], [17,10],
-                [17,11], [17,12], [17,13], [17,14],
-
-                // Connection making dead end 4 look promising
-                [5,17], [6,17], [7,17], [8,17], [9,17],
-
-                // Upper left false network
-                [1,8], [1,7], [1,6], [1,5], [1,4], [1,3], [1,2], [1,1],
-                [2,1], [3,1], [4,1], [5,1],
-                [5,2], [5,3],
-                [6,1], [7,1], [8,1], [9,1],
-                [9,2], [9,3],
-                [10,1], [11,1], [12,1], [13,1],
-                [13,2], [13,3], [13,4], [13,5],
-
-                // More mid-right complexity
-                [25,10], [26,10], [27,10], [28,10],
-                [28,11], [28,12], [28,13], [28,14], [28,15], [28,16],
-                [27,16], [26,16], [25,16],
-                [25,14], [25,12],
+            // MAIN SOLUTION PATH (single continuous path, no loops)
+            // Traced carefully: Start(1,15) -> Exit(26,1)
+            const mainPath = [
+                // Segment 1: Start, go up
+                [1,15], [1,14], [1,13], [1,12], [1,11],
+                // Segment 2: Go right
+                [2,11], [3,11], [4,11], [5,11],
+                // Segment 3: Go down
+                [5,12], [5,13], [5,14],
+                // Segment 4: Go right
+                [6,14], [7,14], [8,14], [9,14],
+                // Segment 5: Go up
+                [9,13], [9,12], [9,11], [9,10],
+                // Segment 6: Go right
+                [10,10], [11,10], [12,10], [13,10],
+                // Segment 7: Go down then right
+                [13,11], [13,12], [13,13],
+                [14,13], [15,13], [16,13], [17,13],
+                // Segment 8: Go up
+                [17,12], [17,11], [17,10], [17,9], [17,8], [17,7],
+                // Segment 9: Go right
+                [18,7], [19,7], [20,7], [21,7],
+                // Segment 10: Go up
+                [21,6], [21,5], [21,4],
+                // Segment 11: Go right then up to exit
+                [22,4], [23,4], [24,4], [25,4],
+                [25,3], [25,2], [25,1], [26,1]
             ];
 
-            // Carve paths
-            for (const [x, y] of paths) {
-                if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+            // DEAD END 1: From (1,11) continue up - top-left corner trap
+            const de1 = [
+                [1,10], [1,9], [1,8], [1,7], [1,6], [1,5], [1,4], [1,3], [1,2], [1,1],
+                [2,1], [3,1], [4,1], [5,1], [6,1], [7,1],
+                [7,2], [7,3], [7,4], [7,5]
+            ];
+
+            // DEAD END 2: From (5,11) branch up - left-side alternate
+            const de2 = [
+                [5,10], [5,9], [5,8], [5,7],
+                [4,7], [3,7], [2,7],
+                [2,6], [2,5], [2,4], [2,3]
+            ];
+
+            // DEAD END 3: From (9,14) continue right - bottom path
+            const de3 = [
+                [10,14], [11,14], [12,14], [13,14], [14,14], [15,14], [16,14],
+                [16,15],
+                [15,15], [14,15], [13,15]
+            ];
+
+            // DEAD END 4: From (9,10) go up - middle shortcut illusion
+            const de4 = [
+                [9,9], [9,8], [9,7], [9,6], [9,5], [9,4], [9,3],
+                [10,3], [11,3], [12,3], [13,3],
+                [13,4], [13,5], [13,6], [13,7]
+            ];
+
+            // DEAD END 5: From (13,10) go up - mid-right path
+            const de5 = [
+                [13,9], [13,8],
+                [14,8], [15,8], [16,8],
+                [16,9], [16,10],
+                [15,10], [14,10]
+            ];
+
+            // DEAD END 6: From (17,13) go right - bottom-right area
+            const de6 = [
+                [18,13], [19,13], [20,13], [21,13],
+                [21,14], [21,15],
+                [22,15], [23,15], [24,15], [25,15],
+                [25,14], [25,13], [25,12], [25,11]
+            ];
+
+            // DEAD END 7: From (17,7) go up - false direct route to top
+            const de7 = [
+                [17,6], [17,5], [17,4], [17,3], [17,2], [17,1],
+                [18,1], [19,1], [20,1], [21,1], [22,1], [23,1]
+            ];
+
+            // DEAD END 8: From (21,7) go right - near-exit trap
+            const de8 = [
+                [22,7], [23,7], [24,7], [25,7], [26,7], [27,7],
+                [27,8], [27,9], [27,10], [27,11],
+                [28,11], [28,10], [28,9], [28,8], [28,7]
+            ];
+
+            // DEAD END 9: Past exit area
+            const de9 = [
+                [27,1], [28,1],
+                [28,2], [28,3], [28,4], [28,5]
+            ];
+
+            // DEAD END 10: From (21,4) branch down-right
+            const de10 = [
+                [21,8], [21,9], [21,10], [21,11],
+                [22,11], [23,11], [24,11]
+            ];
+
+            // Carve all paths
+            const allPaths = [...mainPath, ...de1, ...de2, ...de3, ...de4, ...de5, ...de6, ...de7, ...de8, ...de9, ...de10];
+
+            for (const [x, y] of allPaths) {
+                if (x >= 0 && x < GRID_WIDTH_L1 && y >= 0 && y < GRID_HEIGHT_L1) {
                     maze[y][x] = 0;
                 }
             }
 
-            // Mark dead-end trigger zones (value = 2)
-            maze[19][1] = 2;   // Dead end 1 - bottom of left branch
-            maze[18][1] = 2;   // Dead end 2 - end of early up path
-            maze[28][21] = 2;  // Dead end 3 - far right bottom
-            maze[10][5] = 2;   // Dead end 4 - left branch from middle
-            maze[16][1] = 2;   // Dead end 5 - connects to upper left
-            maze[5][25] = 2;   // Dead end 6 - false exit area
-            maze[1][28] = 2;   // Dead end 7 - top right corner
+            // Dead-end trigger zones (terminus of each dead end)
+            maze[5][7] = 2;   // DE1 terminus
+            maze[3][2] = 2;   // DE2 terminus
+            maze[15][13] = 2; // DE3 terminus
+            maze[7][13] = 2;  // DE4 terminus
+            maze[10][14] = 2; // DE5 terminus
+            maze[11][25] = 2; // DE6 terminus
+            maze[1][23] = 2;  // DE7 terminus
+            maze[7][28] = 2;  // DE8 terminus
+            maze[5][28] = 2;  // DE9 terminus
+            maze[11][24] = 2; // DE10 terminus
 
             return maze;
         }
+
+        // =====================================================
+        // LAYER 2 MAZE - Square with gradient mask
+        // =====================================================
 
         function createMaze2() {
-            // Initialize with all walls
+            const size = GRID_SIZE_L2;
             const maze = [];
-            for (let y = 0; y < GRID_SIZE; y++) {
+            for (let y = 0; y < size; y++) {
                 maze[y] = [];
-                for (let x = 0; x < GRID_SIZE; x++) {
-                    maze[y][x] = 1; // wall
+                for (let x = 0; x < size; x++) {
+                    maze[y][x] = 1;
                 }
             }
 
-            // Layer 2 - Different maze layout, more winding
-            const paths = [
-                // Start area - more open feel
+            // Main path from (1,1) to (15,15)
+            const mainPath = [
                 [1,1], [2,1], [3,1], [4,1], [5,1],
-                [5,2], [5,3], [5,4], [5,5], [5,6], [5,7], [5,8], [5,9],
-                [6,9], [7,9], [8,9], [9,9], [10,9], [11,9],
-                [11,10], [11,11], [11,12], [11,13], [11,14], [11,15],
-                [12,15], [13,15], [14,15], [15,15],
-                [15,14], [15,13], [15,12], [15,11], [15,10], [15,9], [15,8], [15,7],
-                [16,7], [17,7], [18,7], [19,7], [20,7], [21,7],
-                [21,8], [21,9], [21,10], [21,11], [21,12], [21,13], [21,14], [21,15], [21,16], [21,17],
-                [20,17], [19,17], [18,17], [17,17],
-                [17,18], [17,19], [17,20], [17,21], [17,22], [17,23],
-                [18,23], [19,23], [20,23], [21,23], [22,23], [23,23], [24,23], [25,23],
-                [25,24], [25,25], [25,26], [25,27], [25,28],
-                [26,28], [27,28], [28,28], // Exit
-
-                // Dead end 1 - off at (5,9)
-                [4,9], [3,9], [2,9], [1,9],
-
-                // Dead end 2 - off at (15,15)
-                [15,16], [15,17], [15,18], [15,19],
-
-                // Dead end 3 - off at (21,7)
-                [22,7], [23,7], [24,7], [25,7],
-
-                // Dead end 4 - off at (17,23)
-                [17,24], [17,25], [17,26], [17,27],
-
-                // Extra atmosphere paths
-                [1,2], [1,3], [1,4], [1,5], [2,5], [3,5],
-                [9,9], [9,10], [9,11], [9,12], [9,13],
-                [8,13], [7,13], [6,13], [5,13], [4,13], [3,13],
-                [3,14], [3,15], [3,16], [3,17], [3,18], [3,19],
-                [4,19], [5,19], [6,19], [7,19], [8,19], [9,19],
-                [9,20], [9,21], [9,22], [9,23],
-                [10,23], [11,23], [12,23], [13,23], [14,23], [15,23], [16,23],
-                [23,17], [24,17], [25,17],
-                [25,18], [25,19], [25,20], [25,21], [25,22],
+                [5,2], [5,3], [5,4], [5,5],
+                [6,5], [7,5], [8,5], [9,5],
+                [9,6], [9,7], [9,8], [9,9],
+                [10,9], [11,9], [12,9], [13,9],
+                [13,10], [13,11], [13,12], [13,13],
+                [14,13], [15,13],
+                [15,14], [15,15]
             ];
 
-            // Carve paths
-            for (const [x, y] of paths) {
-                if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+            // Dead ends
+            const deadEnds = [
+                [1,2], [1,3], [1,4], [1,5],
+                [2,5], [3,5], [4,5],
+                [9,4], [9,3], [9,2], [9,1],
+                [10,1], [11,1], [12,1], [13,1],
+                [13,2], [13,3], [13,4], [13,5],
+                [14,5], [15,5],
+                [15,6], [15,7], [15,8], [15,9],
+                [5,6], [5,7], [5,8], [5,9],
+                [4,9], [3,9], [2,9], [1,9],
+                [1,10], [1,11], [1,12], [1,13],
+                [2,13], [3,13], [4,13], [5,13],
+                [5,14], [5,15],
+                [6,15], [7,15], [8,15], [9,15],
+                [9,14], [9,13], [9,12], [9,11]
+            ];
+
+            const allPaths = [...mainPath, ...deadEnds];
+            for (const [x, y] of allPaths) {
+                if (x >= 0 && x < size && y >= 0 && y < size) {
                     maze[y][x] = 0;
                 }
             }
 
-            // Mark dead-end trigger zones (value = 2)
-            maze[9][1] = 2;   // Dead end 1 trigger
-            maze[19][15] = 2; // Dead end 2 trigger
-            maze[7][25] = 2;  // Dead end 3 trigger
-            maze[27][17] = 2; // Dead end 4 trigger
+            maze[5][1] = 2;
+            maze[13][1] = 2;
+            maze[15][5] = 2;
+            maze[9][15] = 2;
+            maze[11][9] = 2;
 
             return maze;
         }
 
-        // Get current maze
+        const maze1 = createMaze1();
+        const maze2 = createMaze2();
+
         function getCurrentMaze() {
             return currentLayer === 1 ? maze1 : maze2;
+        }
+
+        function getGridWidth() {
+            return currentLayer === 1 ? GRID_WIDTH_L1 : GRID_SIZE_L2;
+        }
+
+        function getGridHeight() {
+            return currentLayer === 1 ? GRID_HEIGHT_L1 : GRID_SIZE_L2;
         }
 
         // =====================================================
@@ -328,11 +327,7 @@
             if (key === 'a') keys.a = true;
             if (key === 's') keys.s = true;
             if (key === 'd') keys.d = true;
-
-            // Layer switching
-            if (key === 'n') {
-                switchLayer();
-            }
+            if (key === 'n') switchLayer();
         });
 
         document.addEventListener('keyup', (e) => {
@@ -349,12 +344,10 @@
             flashTimer = 0;
 
             if (currentLayer === 1) {
-                // Layer 1: Start at bottom-left
                 playerX = 1;
-                playerY = 28;
+                playerY = 15;
                 layerIndicator.textContent = 'Layer 1 - Bordered Maze';
             } else {
-                // Layer 2: Start at top-left
                 playerX = 1;
                 playerY = 1;
                 layerIndicator.textContent = 'Layer 2 - Endless Maze (Gradient Mask)';
@@ -367,26 +360,21 @@
 
         function canMoveTo(x, y) {
             const maze = getCurrentMaze();
-            if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) {
-                return false;
-            }
-            return maze[y][x] !== 1; // Can move if not a wall
+            const w = getGridWidth();
+            const h = getGridHeight();
+            if (x < 0 || x >= w || y < 0 || y >= h) return false;
+            return maze[y][x] !== 1;
         }
 
         function checkDeadEndTrigger(x, y) {
             const maze = getCurrentMaze();
-            if (maze[y][x] === 2 && !isFlashing) {
-                triggerFlash();
+            if (maze[y] && maze[y][x] === 2 && !isFlashing) {
+                isFlashing = true;
+                flashTimer = FLASH_DURATION;
             }
         }
 
-        function triggerFlash() {
-            isFlashing = true;
-            flashTimer = FLASH_DURATION;
-        }
-
         function update() {
-            // Handle movement with cooldown
             if (moveCooldown > 0) {
                 moveCooldown--;
             } else {
@@ -407,12 +395,9 @@
                 }
             }
 
-            // Update flash timer
             if (isFlashing) {
                 flashTimer--;
-                if (flashTimer <= 0) {
-                    isFlashing = false;
-                }
+                if (flashTimer <= 0) isFlashing = false;
             }
         }
 
@@ -421,63 +406,78 @@
         // =====================================================
 
         function render() {
-            // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const maze = getCurrentMaze();
+            const gridW = getGridWidth();
+            const gridH = getGridHeight();
             const wallColor = isFlashing ? '#ff3333' : '#ffffff';
 
-            // Draw maze
-            for (let y = 0; y < GRID_SIZE; y++) {
-                for (let x = 0; x < GRID_SIZE; x++) {
+            const mazePixelW = gridW * CELL_SIZE;
+            const mazePixelH = gridH * CELL_SIZE;
+            const offsetX = Math.floor((canvas.width - mazePixelW) / 2);
+            const offsetY = Math.floor((canvas.height - mazePixelH) / 2);
+
+            // Draw maze walls
+            for (let y = 0; y < gridH; y++) {
+                for (let x = 0; x < gridW; x++) {
+                    const px = offsetX + x * CELL_SIZE;
+                    const py = offsetY + y * CELL_SIZE;
+
                     if (maze[y][x] === 1) {
                         ctx.fillStyle = wallColor;
-                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        ctx.fillRect(px, py, CELL_SIZE, CELL_SIZE);
                     }
-                    // Optionally visualize trigger zones subtly
                     if (maze[y][x] === 2) {
                         ctx.fillStyle = isFlashing ? 'rgba(255, 100, 100, 0.3)' : 'rgba(255, 255, 255, 0.1)';
-                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        ctx.fillRect(px, py, CELL_SIZE, CELL_SIZE);
                     }
                 }
             }
 
-            // Get exit and start positions based on layer
+            // Exit and start positions
             let exitX, exitY, startX, startY;
             if (currentLayer === 1) {
-                // Layer 1: Start bottom-left, Exit upper-right near center
-                startX = 1; startY = 28;
-                exitX = 22; exitY = 5;
+                startX = 1; startY = 15;
+                exitX = 26; exitY = 1;
             } else {
-                // Layer 2: Start top-left, Exit bottom-right
                 startX = 1; startY = 1;
-                exitX = 28; exitY = 28;
+                exitX = 15; exitY = 15;
             }
 
-            // Draw exit marker
+            // Draw exit marker (pulsing green)
             ctx.fillStyle = '#00ff00';
             ctx.globalAlpha = 0.5 + 0.5 * Math.sin(Date.now() / 200);
-            ctx.fillRect(exitX * CELL_SIZE + 5, exitY * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+            ctx.fillRect(
+                offsetX + exitX * CELL_SIZE + 5,
+                offsetY + exitY * CELL_SIZE + 5,
+                CELL_SIZE - 10, CELL_SIZE - 10
+            );
             ctx.globalAlpha = 1;
 
-            // Draw start marker
+            // Draw start marker (cyan)
             ctx.fillStyle = '#00ffff';
             ctx.globalAlpha = 0.3;
-            ctx.fillRect(startX * CELL_SIZE + 5, startY * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+            ctx.fillRect(
+                offsetX + startX * CELL_SIZE + 5,
+                offsetY + startY * CELL_SIZE + 5,
+                CELL_SIZE - 10, CELL_SIZE - 10
+            );
             ctx.globalAlpha = 1;
 
-            // Layer 2: Apply radial gradient mask for "endless" effect
+            // Layer 2: Radial gradient mask for endless effect
             if (currentLayer === 2) {
+                const centerX = offsetX + (gridW * CELL_SIZE) / 2;
+                const centerY = offsetY + (gridH * CELL_SIZE) / 2;
                 const gradient = ctx.createRadialGradient(
-                    canvas.width / 2, canvas.height / 2, 200,  // Inner circle
-                    canvas.width / 2, canvas.height / 2, 500   // Outer circle
+                    centerX, centerY, 100,
+                    centerX, centerY, 350
                 );
                 gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
                 gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.3)');
                 gradient.addColorStop(0.8, 'rgba(0, 0, 0, 0.7)');
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
-
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
@@ -486,12 +486,12 @@
             if (currentLayer === 1) {
                 ctx.strokeStyle = wallColor;
                 ctx.lineWidth = 4;
-                ctx.strokeRect(2, 2, MAZE_WIDTH - 4, MAZE_HEIGHT - 4);
+                ctx.strokeRect(offsetX, offsetY, mazePixelW, mazePixelH);
             }
 
-            // Draw player (always on top)
-            const playerScreenX = playerX * CELL_SIZE + CELL_SIZE / 2;
-            const playerScreenY = playerY * CELL_SIZE + CELL_SIZE / 2;
+            // Draw player
+            const playerScreenX = offsetX + playerX * CELL_SIZE + CELL_SIZE / 2;
+            const playerScreenY = offsetY + playerY * CELL_SIZE + CELL_SIZE / 2;
 
             ctx.beginPath();
             ctx.arc(playerScreenX, playerScreenY, PLAYER_RADIUS, 0, Math.PI * 2);
@@ -501,14 +501,14 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Draw player glow
+            // Player glow
             ctx.beginPath();
             ctx.arc(playerScreenX, playerScreenY, PLAYER_RADIUS + 3, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
             ctx.lineWidth = 4;
             ctx.stroke();
 
-            // Draw coordinates (debug info)
+            // Position indicator
             ctx.fillStyle = '#666';
             ctx.font = '12px monospace';
             ctx.fillText(`Position: (${playerX}, ${playerY})`, 10, canvas.height - 10);
@@ -524,7 +524,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Start the game
         gameLoop();
     </script>
 </body>
