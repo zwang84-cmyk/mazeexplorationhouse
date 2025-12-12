@@ -94,7 +94,7 @@
         // Game state
         let currentLayer = 1;
         let playerX = 1;
-        let playerY = 1;
+        let playerY = 28; // Layer 1 starts at bottom-left
         let flashTimer = 0;
         let isFlashing = false;
         const FLASH_DURATION = 12; // frames (~0.2 seconds at 60fps)
@@ -132,47 +132,99 @@
                 }
             }
 
-            // Carve out the main path and dead ends
-            // Main solution path from (1,1) to (28,28)
+            // Complex maze: Start at (1,28) bottom-left, Exit at (22,5) upper-right near center
+            // The path winds extensively with many turns to obscure the correct route
             const paths = [
-                // Start area
-                [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1],
-                [7,2], [7,3], [7,4], [7,5],
-                [8,5], [9,5], [10,5], [11,5], [12,5], [13,5],
-                [13,6], [13,7], [13,8], [13,9],
-                [14,9], [15,9], [16,9], [17,9], [18,9], [19,9],
-                [19,10], [19,11], [19,12], [19,13],
-                [18,13], [17,13], [16,13], [15,13], [14,13], [13,13],
-                [13,14], [13,15], [13,16], [13,17],
-                [14,17], [15,17], [16,17], [17,17], [18,17], [19,17], [20,17], [21,17],
-                [21,18], [21,19], [21,20], [21,21],
-                [22,21], [23,21], [24,21], [25,21],
-                [25,22], [25,23], [25,24], [25,25],
-                [26,25], [27,25], [28,25],
-                [28,26], [28,27], [28,28], // Exit
+                // === MAIN SOLUTION PATH (very long and winding) ===
+                // Start area - bottom left
+                [1,28], [1,27], [1,26], [1,25], [1,24],
+                [2,24], [3,24], [4,24], [5,24],
+                [5,25], [5,26], [5,27], [5,28],
+                [6,28], [7,28], [8,28], [9,28],
+                [9,27], [9,26], [9,25], [9,24], [9,23], [9,22],
+                [10,22], [11,22], [12,22], [13,22],
+                [13,23], [13,24], [13,25], [13,26],
+                [14,26], [15,26], [16,26], [17,26],
+                [17,25], [17,24], [17,23], [17,22], [17,21], [17,20],
+                [16,20], [15,20], [14,20], [13,20],
+                [13,19], [13,18], [13,17], [13,16],
+                [12,16], [11,16], [10,16], [9,16],
+                [9,15], [9,14], [9,13], [9,12],
+                [10,12], [11,12], [12,12], [13,12],
+                [13,11], [13,10], [13,9], [13,8],
+                [12,8], [11,8], [10,8], [9,8], [8,8], [7,8], [6,8], [5,8],
+                [5,7], [5,6], [5,5], [5,4],
+                [6,4], [7,4], [8,4], [9,4], [10,4], [11,4],
+                [11,5], [11,6], [11,7],
+                [12,7], [13,7], [14,7], [15,7],
+                [15,6], [15,5], [15,4], [15,3],
+                [16,3], [17,3], [18,3], [19,3],
+                [19,4], [19,5], [19,6], [19,7],
+                [20,7], [21,7], [22,7],
+                [22,6], [22,5], // EXIT
 
-                // Dead end 1 - off main path at (7,5)
-                [7,6], [7,7], [7,8], [7,9],
+                // === DEAD END 1 - Branches from start area going left ===
+                [1,23], [1,22], [1,21], [1,20], [1,19],
 
-                // Dead end 2 - off main path at (19,9)
-                [20,9], [21,9], [22,9], [23,9],
+                // === DEAD END 2 - False path from (5,24) going up early ===
+                [5,23], [5,22], [5,21], [5,20], [5,19], [5,18],
+                [4,18], [3,18], [2,18], [1,18],
 
-                // Dead end 3 - off main path at (13,17)
-                [12,17], [11,17], [10,17], [9,17],
+                // === DEAD END 3 - Branch from (9,22) going right ===
+                [14,22], [15,22], [16,22], [17,22],
+                [18,22], [19,22], [20,22], [21,22],
+                [21,23], [21,24], [21,25], [21,26], [21,27], [21,28],
 
-                // Dead end 4 - off main path at (25,21)
-                [25,20], [25,19], [25,18], [25,17],
+                // === DEAD END 4 - Branch from (13,16) going left ===
+                [8,16], [7,16], [6,16], [5,16],
+                [5,15], [5,14], [5,13], [5,12], [5,11], [5,10],
 
-                // Extra corridors for complexity
-                [1,2], [1,3], [1,4], [1,5], [2,5], [3,5], [4,5], [5,5], [6,5],
-                [3,5], [3,6], [3,7], [3,8], [3,9], [3,10], [3,11],
-                [4,11], [5,11], [6,11], [7,11], [8,11], [9,11], [10,11], [11,11],
-                [11,12], [11,13], [11,14], [11,15],
-                [10,15], [9,15], [8,15], [7,15], [6,15], [5,15],
-                [5,16], [5,17], [5,18], [5,19], [5,20], [5,21],
-                [6,21], [7,21], [8,21], [9,21], [10,21], [11,21],
-                [11,22], [11,23], [11,24], [11,25],
-                [12,25], [13,25], [14,25], [15,25], [16,25], [17,25], [18,25], [19,25], [20,25], [21,25], [22,25], [23,25], [24,25],
+                // === DEAD END 5 - Branch at (5,8) going down ===
+                [5,9], [5,10], [4,10], [3,10], [2,10], [1,10],
+                [1,11], [1,12], [1,13], [1,14], [1,15], [1,16],
+
+                // === DEAD END 6 - False exit path from (19,3) going up ===
+                [19,2], [19,1],
+                [20,1], [21,1], [22,1], [23,1], [24,1], [25,1],
+                [25,2], [25,3], [25,4], [25,5],
+
+                // === DEAD END 7 - Branch from (22,7) continuing right ===
+                [23,7], [24,7], [25,7], [26,7], [27,7], [28,7],
+                [28,6], [28,5], [28,4], [28,3], [28,2], [28,1],
+
+                // === MISLEADING CORRIDORS (look like main paths) ===
+
+                // Large false network in bottom-right
+                [21,28], [22,28], [23,28], [24,28], [25,28],
+                [25,27], [25,26], [25,25], [25,24], [25,23], [25,22],
+                [24,22], [23,22], [22,22],
+                [25,21], [25,20], [25,19], [25,18],
+                [26,18], [27,18], [28,18],
+                [28,19], [28,20], [28,21], [28,22], [28,23], [28,24], [28,25], [28,26], [28,27], [28,28],
+
+                // False path in middle area
+                [17,16], [18,16], [19,16], [20,16], [21,16],
+                [21,15], [21,14], [21,13], [21,12], [21,11], [21,10],
+                [20,10], [19,10], [18,10], [17,10],
+                [17,11], [17,12], [17,13], [17,14],
+
+                // Connection making dead end 4 look promising
+                [5,17], [6,17], [7,17], [8,17], [9,17],
+
+                // Upper left false network
+                [1,8], [1,7], [1,6], [1,5], [1,4], [1,3], [1,2], [1,1],
+                [2,1], [3,1], [4,1], [5,1],
+                [5,2], [5,3],
+                [6,1], [7,1], [8,1], [9,1],
+                [9,2], [9,3],
+                [10,1], [11,1], [12,1], [13,1],
+                [13,2], [13,3], [13,4], [13,5],
+
+                // More mid-right complexity
+                [25,10], [26,10], [27,10], [28,10],
+                [28,11], [28,12], [28,13], [28,14], [28,15], [28,16],
+                [27,16], [26,16], [25,16],
+                [25,14], [25,12],
             ];
 
             // Carve paths
@@ -183,10 +235,13 @@
             }
 
             // Mark dead-end trigger zones (value = 2)
-            maze[9][7] = 2;   // Dead end 1 trigger
-            maze[9][23] = 2;  // Dead end 2 trigger
-            maze[17][9] = 2;  // Dead end 3 trigger
-            maze[17][25] = 2; // Dead end 4 trigger
+            maze[19][1] = 2;   // Dead end 1 - bottom of left branch
+            maze[18][1] = 2;   // Dead end 2 - end of early up path
+            maze[28][21] = 2;  // Dead end 3 - far right bottom
+            maze[10][5] = 2;   // Dead end 4 - left branch from middle
+            maze[16][1] = 2;   // Dead end 5 - connects to upper left
+            maze[5][25] = 2;   // Dead end 6 - false exit area
+            maze[1][28] = 2;   // Dead end 7 - top right corner
 
             return maze;
         }
@@ -290,14 +345,18 @@
 
         function switchLayer() {
             currentLayer = currentLayer === 1 ? 2 : 1;
-            playerX = 1;
-            playerY = 1;
             isFlashing = false;
             flashTimer = 0;
 
             if (currentLayer === 1) {
+                // Layer 1: Start at bottom-left
+                playerX = 1;
+                playerY = 28;
                 layerIndicator.textContent = 'Layer 1 - Bordered Maze';
             } else {
+                // Layer 2: Start at top-left
+                playerX = 1;
+                playerY = 1;
                 layerIndicator.textContent = 'Layer 2 - Endless Maze (Gradient Mask)';
             }
         }
@@ -384,16 +443,28 @@
                 }
             }
 
+            // Get exit and start positions based on layer
+            let exitX, exitY, startX, startY;
+            if (currentLayer === 1) {
+                // Layer 1: Start bottom-left, Exit upper-right near center
+                startX = 1; startY = 28;
+                exitX = 22; exitY = 5;
+            } else {
+                // Layer 2: Start top-left, Exit bottom-right
+                startX = 1; startY = 1;
+                exitX = 28; exitY = 28;
+            }
+
             // Draw exit marker
             ctx.fillStyle = '#00ff00';
             ctx.globalAlpha = 0.5 + 0.5 * Math.sin(Date.now() / 200);
-            ctx.fillRect(28 * CELL_SIZE + 5, 28 * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+            ctx.fillRect(exitX * CELL_SIZE + 5, exitY * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
             ctx.globalAlpha = 1;
 
             // Draw start marker
             ctx.fillStyle = '#00ffff';
             ctx.globalAlpha = 0.3;
-            ctx.fillRect(1 * CELL_SIZE + 5, 1 * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+            ctx.fillRect(startX * CELL_SIZE + 5, startY * CELL_SIZE + 5, CELL_SIZE - 10, CELL_SIZE - 10);
             ctx.globalAlpha = 1;
 
             // Layer 2: Apply radial gradient mask for "endless" effect
