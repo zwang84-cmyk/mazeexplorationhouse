@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Exploration - Flashlight Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            cursor: none;
+        }
+
+        #maze-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #maze-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #flashlight-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: #000;
+            mask-image: radial-gradient(circle 120px at var(--mouse-x, -200px) var(--mouse-y, -200px),
+                transparent 0%,
+                transparent 60%,
+                rgba(0, 0, 0, 0.3) 80%,
+                rgba(0, 0, 0, 0.7) 90%,
+                black 100%);
+            -webkit-mask-image: radial-gradient(circle 120px at var(--mouse-x, -200px) var(--mouse-y, -200px),
+                transparent 0%,
+                transparent 60%,
+                rgba(0, 0, 0, 0.3) 80%,
+                rgba(0, 0, 0, 0.7) 90%,
+                black 100%);
+        }
+
+        #custom-cursor {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+        }
+
+        /* Loading state */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        #loading.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <p>Loading maze...</p>
+        <div id="file-picker" style="display: none; margin-top: 20px;">
+            <p style="margin-bottom: 10px;">Drag & drop your maze image here, or:</p>
+            <input type="file" id="maze-file" accept="image/*">
+        </div>
+    </div>
+
+    <div id="maze-container">
+        <img id="maze-image" src="maze.png" alt="Maze">
+    </div>
+
+    <div id="flashlight-overlay"></div>
+    <div id="custom-cursor"></div>
+
+    <script>
+        const overlay = document.getElementById('flashlight-overlay');
+        const cursor = document.getElementById('custom-cursor');
+        const mazeImage = document.getElementById('maze-image');
+        const loading = document.getElementById('loading');
+
+        let mouseX = -200;
+        let mouseY = -200;
+        let targetX = -200;
+        let targetY = -200;
+
+        // Smoothing factor (lower = smoother but slower)
+        const smoothing = 0.15;
+
+        // Handle image load
+        mazeImage.onload = function() {
+            loading.classList.add('hidden');
+            cursor.style.display = 'block';
+        };
+
+        mazeImage.onerror = function() {
+            // Show file picker if maze.png not found
+            document.querySelector('#loading p').textContent = 'maze.png not found';
+            document.getElementById('file-picker').style.display = 'block';
+        };
+
+        // Handle file selection
+        function loadImageFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    mazeImage.src = event.target.result;
+                    loading.classList.add('hidden');
+                    cursor.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('maze-file').addEventListener('change', function(e) {
+            loadImageFile(e.target.files[0]);
+        });
+
+        // Drag and drop support
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const file = e.dataTransfer.files[0];
+            loadImageFile(file);
+        });
+
+        // Track mouse position
+        document.addEventListener('mousemove', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+        });
+
+        // Handle mouse leaving the window
+        document.addEventListener('mouseleave', () => {
+            targetX = -200;
+            targetY = -200;
+        });
+
+        // Handle mouse entering the window
+        document.addEventListener('mouseenter', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+            // Jump to position immediately on enter
+            mouseX = targetX;
+            mouseY = targetY;
+        });
+
+        // Smooth animation loop
+        function animate() {
+            // Smooth interpolation
+            mouseX += (targetX - mouseX) * smoothing;
+            mouseY += (targetY - mouseY) * smoothing;
+
+            // Update CSS custom properties for the mask
+            overlay.style.setProperty('--mouse-x', `${mouseX}px`);
+            overlay.style.setProperty('--mouse-y', `${mouseY}px`);
+
+            // Update cursor position
+            cursor.style.left = `${mouseX}px`;
+            cursor.style.top = `${mouseY}px`;
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
