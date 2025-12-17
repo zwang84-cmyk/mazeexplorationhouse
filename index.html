@@ -86,6 +86,17 @@
         #loading.hidden {
             display: none;
         }
+
+        #player {
+            position: fixed;
+            height: 36px;
+            width: auto;
+            pointer-events: none;
+            z-index: 50;
+            transform: translate(-50%, -50%);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +112,8 @@
         <img id="maze-image" src="maze.png" alt="Maze">
     </div>
 
+    <img id="player" src="character.png" alt="Player">
+
     <div id="flashlight-overlay"></div>
     <div id="custom-cursor"></div>
 
@@ -109,11 +122,30 @@
         const cursor = document.getElementById('custom-cursor');
         const mazeImage = document.getElementById('maze-image');
         const loading = document.getElementById('loading');
+        const player = document.getElementById('player');
 
         let mouseX = -200;
         let mouseY = -200;
         let targetX = -200;
         let targetY = -200;
+
+        // Player position (start at center of screen)
+        let playerX = window.innerWidth / 2;
+        let playerY = window.innerHeight / 2;
+        let playerVelX = 0;
+        let playerVelY = 0;
+
+        // Movement settings
+        const moveSpeed = 3;
+        const friction = 0.85;
+
+        // Track pressed keys
+        const keys = {
+            w: false,
+            a: false,
+            s: false,
+            d: false
+        };
 
         // Smoothing factor (lower = smoother but slower)
         const smoothing = 0.15;
@@ -181,9 +213,26 @@
             mouseY = targetY;
         });
 
+        // Keyboard input
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (key in keys) {
+                keys[key] = true;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key in keys) {
+                keys[key] = false;
+                e.preventDefault();
+            }
+        });
+
         // Smooth animation loop
         function animate() {
-            // Smooth interpolation
+            // Smooth interpolation for flashlight
             mouseX += (targetX - mouseX) * smoothing;
             mouseY += (targetY - mouseY) * smoothing;
 
@@ -194,6 +243,24 @@
             // Update cursor position
             cursor.style.left = `${mouseX}px`;
             cursor.style.top = `${mouseY}px`;
+
+            // Update player velocity based on keys
+            if (keys.w) playerVelY -= moveSpeed;
+            if (keys.s) playerVelY += moveSpeed;
+            if (keys.a) playerVelX -= moveSpeed;
+            if (keys.d) playerVelX += moveSpeed;
+
+            // Apply friction for smooth deceleration
+            playerVelX *= friction;
+            playerVelY *= friction;
+
+            // Update player position
+            playerX += playerVelX;
+            playerY += playerVelY;
+
+            // Update player element position
+            player.style.left = `${playerX}px`;
+            player.style.top = `${playerY}px`;
 
             requestAnimationFrame(animate);
         }
