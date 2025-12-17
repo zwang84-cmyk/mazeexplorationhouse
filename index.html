@@ -154,11 +154,12 @@
         let targetX = -200;
         let targetY = -200;
 
-        // Player position (start at center of screen)
-        let playerX = window.innerWidth / 2;
-        let playerY = window.innerHeight / 2;
+        // Player position (will be set to maze entrance on init)
+        let playerX = 0;
+        let playerY = 0;
         let playerVelX = 0;
         let playerVelY = 0;
+        let gameWon = false;
 
         // Movement settings
         const moveSpeed = 1;
@@ -183,6 +184,10 @@
             collisionCtx.drawImage(mazeImage, 0, 0);
 
             updateMazeRect();
+
+            // Set player start position at top-left entrance
+            playerX = mazeRect.left + 50;
+            playerY = mazeRect.top + 50;
         }
 
         // Update maze position info
@@ -331,6 +336,16 @@
 
             player.style.left = `${playerX}px`;
             player.style.top = `${playerY}px`;
+
+            // Check if player reached goal (bottom-right corner)
+            if (!gameWon && mazeRect) {
+                const goalX = mazeRect.right - 50;
+                const goalY = mazeRect.bottom - 50;
+                if (playerX > goalX && playerY > goalY) {
+                    gameWon = true;
+                    alert('You escaped the labyrinth!');
+                }
+            }
 
             requestAnimationFrame(animate);
         }
