@@ -95,7 +95,7 @@
             justify-content: center;
             align-items: center;
             background: #000;
-            cursor: pointer;
+            cursor: default;
         }
 
         #start-screen img {
@@ -136,8 +136,27 @@
         const startScreen = document.getElementById('start-screen');
         const mazeContainer = document.getElementById('maze-container');
 
-        // Start screen click handler
-        startScreen.addEventListener('click', function() {
+        // "Start Exploration" button region (relative to image: x 39-61%, y 77-87%)
+        const buttonRegion = { xMin: 0.39, xMax: 0.61, yMin: 0.77, yMax: 0.87 };
+
+        function isInButtonRegion(e) {
+            const img = startScreen.querySelector('img');
+            const rect = img.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            return x >= buttonRegion.xMin && x <= buttonRegion.xMax &&
+                   y >= buttonRegion.yMin && y <= buttonRegion.yMax;
+        }
+
+        // Update cursor when hovering over button region
+        startScreen.addEventListener('mousemove', function(e) {
+            startScreen.style.cursor = isInButtonRegion(e) ? 'pointer' : 'default';
+        });
+
+        // Start screen click handler - only responds to "Start Exploration" area
+        startScreen.addEventListener('click', function(e) {
+            if (!isInButtonRegion(e)) return;
+
             // Hide start screen
             startScreen.classList.add('hidden');
 
