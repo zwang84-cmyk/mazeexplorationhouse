@@ -28,19 +28,23 @@
             padding: 10px;
         }
         svg {
-            max-width: 98vw;
-            max-height: 98vh;
+            width: 95vw;
+            height: 95vh;
+            max-width: 1380px;
+            max-height: 900px;
         }
         .maze-line {
-            stroke: #fff;
+            stroke: #ffffff;
             stroke-width: 7;
             stroke-linecap: square;
             stroke-linejoin: miter;
             fill: none;
-            filter: drop-shadow(0 0 0.5px rgba(255,255,255,0.4));
+        }
+        .glow {
+            filter: drop-shadow(0 0 1px rgba(255,255,255,0.5));
         }
         .arrow {
-            stroke: #fff;
+            stroke: #ffffff;
             stroke-width: 2;
             fill: none;
         }
@@ -48,278 +52,259 @@
 </head>
 <body>
     <div class="maze-container">
-        <svg viewBox="0 0 1380 900" preserveAspectRatio="xMidYMid meet">
-            <defs>
-                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="0.5" result="blur"/>
-                    <feMerge>
-                        <feMergeNode in="blur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                </filter>
-            </defs>
+        <svg viewBox="0 0 1380 900" preserveAspectRatio="xMidYMid meet" class="glow">
+            <!-- Outer border -->
+            <line class="maze-line" x1="40" y1="40" x2="1340" y2="40" />
+            <line class="maze-line" x1="1340" y1="40" x2="1340" y2="740" />
+            <line class="maze-line" x1="1340" y1="800" x2="1340" y2="860" />
+            <line class="maze-line" x1="40" y1="860" x2="1340" y2="860" />
+            <line class="maze-line" x1="40" y1="40" x2="40" y2="860" />
 
-            <g filter="url(#glow)">
-                <!-- Outer border -->
-                <!-- Top wall (complete) -->
-                <line class="maze-line" x1="40" y1="40" x2="1340" y2="40" />
-                <!-- Right wall with exit gap near bottom -->
-                <line class="maze-line" x1="1340" y1="40" x2="1340" y2="740" />
-                <line class="maze-line" x1="1340" y1="800" x2="1340" y2="860" />
-                <!-- Bottom wall -->
-                <line class="maze-line" x1="40" y1="860" x2="1340" y2="860" />
-                <!-- Left wall (complete) -->
-                <line class="maze-line" x1="40" y1="40" x2="40" y2="860" />
+            <!-- ROW 1 vertical walls -->
+            <line class="maze-line" x1="180" y1="40" x2="180" y2="110" />
+            <line class="maze-line" x1="250" y1="40" x2="250" y2="110" />
+            <line class="maze-line" x1="390" y1="40" x2="390" y2="180" />
+            <line class="maze-line" x1="460" y1="40" x2="460" y2="110" />
+            <line class="maze-line" x1="600" y1="40" x2="600" y2="180" />
+            <line class="maze-line" x1="670" y1="40" x2="670" y2="110" />
+            <line class="maze-line" x1="740" y1="40" x2="740" y2="180" />
+            <line class="maze-line" x1="810" y1="40" x2="810" y2="110" />
+            <line class="maze-line" x1="880" y1="40" x2="880" y2="110" />
+            <line class="maze-line" x1="1020" y1="40" x2="1020" y2="110" />
+            <line class="maze-line" x1="1090" y1="40" x2="1090" y2="180" />
+            <line class="maze-line" x1="1160" y1="40" x2="1160" y2="110" />
 
-                <!-- === ROW 1 (y=40 to y=110) === -->
-                <!-- Vertical walls from top -->
-                <line class="maze-line" x1="180" y1="40" x2="180" y2="110" />
-                <line class="maze-line" x1="250" y1="40" x2="250" y2="110" />
-                <line class="maze-line" x1="390" y1="40" x2="390" y2="180" />
-                <line class="maze-line" x1="460" y1="40" x2="460" y2="110" />
-                <line class="maze-line" x1="600" y1="40" x2="600" y2="180" />
-                <line class="maze-line" x1="670" y1="40" x2="670" y2="110" />
-                <line class="maze-line" x1="740" y1="40" x2="740" y2="180" />
-                <line class="maze-line" x1="810" y1="40" x2="810" y2="110" />
-                <line class="maze-line" x1="880" y1="40" x2="880" y2="110" />
-                <line class="maze-line" x1="1020" y1="40" x2="1020" y2="110" />
-                <line class="maze-line" x1="1090" y1="40" x2="1090" y2="180" />
-                <line class="maze-line" x1="1160" y1="40" x2="1160" y2="110" />
+            <!-- ROW 1 horizontal walls -->
+            <line class="maze-line" x1="40" y1="110" x2="110" y2="110" />
+            <line class="maze-line" x1="180" y1="110" x2="320" y2="110" />
+            <line class="maze-line" x1="460" y1="110" x2="530" y2="110" />
+            <line class="maze-line" x1="670" y1="110" x2="740" y2="110" />
+            <line class="maze-line" x1="810" y1="110" x2="950" y2="110" />
+            <line class="maze-line" x1="1020" y1="110" x2="1090" y2="110" />
+            <line class="maze-line" x1="1160" y1="110" x2="1270" y2="110" />
 
-                <!-- Horizontal walls in row 1 -->
-                <line class="maze-line" x1="40" y1="110" x2="110" y2="110" />
-                <line class="maze-line" x1="180" y1="110" x2="320" y2="110" />
-                <line class="maze-line" x1="460" y1="110" x2="530" y2="110" />
-                <line class="maze-line" x1="670" y1="110" x2="740" y2="110" />
-                <line class="maze-line" x1="810" y1="110" x2="950" y2="110" />
-                <line class="maze-line" x1="1020" y1="110" x2="1090" y2="110" />
-                <line class="maze-line" x1="1160" y1="110" x2="1270" y2="110" />
+            <!-- ROW 2 vertical walls -->
+            <line class="maze-line" x1="110" y1="110" x2="110" y2="250" />
+            <line class="maze-line" x1="180" y1="110" x2="180" y2="250" />
+            <line class="maze-line" x1="320" y1="110" x2="320" y2="180" />
+            <line class="maze-line" x1="460" y1="110" x2="460" y2="250" />
+            <line class="maze-line" x1="530" y1="110" x2="530" y2="180" />
+            <line class="maze-line" x1="670" y1="110" x2="670" y2="250" />
+            <line class="maze-line" x1="810" y1="110" x2="810" y2="250" />
+            <line class="maze-line" x1="950" y1="110" x2="950" y2="180" />
+            <line class="maze-line" x1="1020" y1="110" x2="1020" y2="180" />
+            <line class="maze-line" x1="1160" y1="110" x2="1160" y2="250" />
+            <line class="maze-line" x1="1230" y1="110" x2="1230" y2="250" />
 
-                <!-- === ROW 2 (y=110 to y=180) === -->
-                <line class="maze-line" x1="110" y1="110" x2="110" y2="250" />
-                <line class="maze-line" x1="180" y1="110" x2="180" y2="250" />
-                <line class="maze-line" x1="320" y1="110" x2="320" y2="180" />
-                <line class="maze-line" x1="460" y1="110" x2="460" y2="250" />
-                <line class="maze-line" x1="530" y1="110" x2="530" y2="180" />
-                <line class="maze-line" x1="670" y1="110" x2="670" y2="250" />
-                <line class="maze-line" x1="810" y1="110" x2="810" y2="250" />
-                <line class="maze-line" x1="950" y1="110" x2="950" y2="180" />
-                <line class="maze-line" x1="1020" y1="110" x2="1020" y2="180" />
-                <line class="maze-line" x1="1160" y1="110" x2="1160" y2="250" />
-                <line class="maze-line" x1="1230" y1="110" x2="1230" y2="250" />
+            <!-- ROW 2 horizontal walls -->
+            <line class="maze-line" x1="40" y1="180" x2="110" y2="180" />
+            <line class="maze-line" x1="180" y1="180" x2="250" y2="180" />
+            <line class="maze-line" x1="320" y1="180" x2="390" y2="180" />
+            <line class="maze-line" x1="460" y1="180" x2="530" y2="180" />
+            <line class="maze-line" x1="600" y1="180" x2="670" y2="180" />
+            <line class="maze-line" x1="740" y1="180" x2="810" y2="180" />
+            <line class="maze-line" x1="880" y1="180" x2="950" y2="180" />
+            <line class="maze-line" x1="1020" y1="180" x2="1090" y2="180" />
+            <line class="maze-line" x1="1160" y1="180" x2="1230" y2="180" />
+            <line class="maze-line" x1="1270" y1="180" x2="1340" y2="180" />
 
-                <!-- Horizontal walls in row 2 -->
-                <line class="maze-line" x1="40" y1="180" x2="110" y2="180" />
-                <line class="maze-line" x1="180" y1="180" x2="250" y2="180" />
-                <line class="maze-line" x1="320" y1="180" x2="390" y2="180" />
-                <line class="maze-line" x1="460" y1="180" x2="530" y2="180" />
-                <line class="maze-line" x1="600" y1="180" x2="670" y2="180" />
-                <line class="maze-line" x1="740" y1="180" x2="810" y2="180" />
-                <line class="maze-line" x1="880" y1="180" x2="950" y2="180" />
-                <line class="maze-line" x1="1020" y1="180" x2="1090" y2="180" />
-                <line class="maze-line" x1="1160" y1="180" x2="1230" y2="180" />
-                <line class="maze-line" x1="1270" y1="180" x2="1340" y2="180" />
+            <!-- ROW 3 vertical walls -->
+            <line class="maze-line" x1="250" y1="180" x2="250" y2="320" />
+            <line class="maze-line" x1="320" y1="180" x2="320" y2="320" />
+            <line class="maze-line" x1="390" y1="180" x2="390" y2="320" />
+            <line class="maze-line" x1="530" y1="180" x2="530" y2="250" />
+            <line class="maze-line" x1="600" y1="180" x2="600" y2="320" />
+            <line class="maze-line" x1="740" y1="180" x2="740" y2="320" />
+            <line class="maze-line" x1="880" y1="180" x2="880" y2="250" />
+            <line class="maze-line" x1="950" y1="180" x2="950" y2="250" />
+            <line class="maze-line" x1="1020" y1="180" x2="1020" y2="320" />
+            <line class="maze-line" x1="1090" y1="180" x2="1090" y2="320" />
+            <line class="maze-line" x1="1270" y1="180" x2="1270" y2="390" />
 
-                <!-- === ROW 3 (y=180 to y=250) === -->
-                <line class="maze-line" x1="250" y1="180" x2="250" y2="320" />
-                <line class="maze-line" x1="320" y1="180" x2="320" y2="320" />
-                <line class="maze-line" x1="390" y1="180" x2="390" y2="320" />
-                <line class="maze-line" x1="530" y1="180" x2="530" y2="250" />
-                <line class="maze-line" x1="600" y1="180" x2="600" y2="320" />
-                <line class="maze-line" x1="740" y1="180" x2="740" y2="320" />
-                <line class="maze-line" x1="880" y1="180" x2="880" y2="250" />
-                <line class="maze-line" x1="950" y1="180" x2="950" y2="250" />
-                <line class="maze-line" x1="1020" y1="180" x2="1020" y2="320" />
-                <line class="maze-line" x1="1090" y1="180" x2="1090" y2="320" />
-                <line class="maze-line" x1="1270" y1="180" x2="1270" y2="390" />
+            <!-- ROW 3 horizontal walls -->
+            <line class="maze-line" x1="40" y1="250" x2="110" y2="250" />
+            <line class="maze-line" x1="180" y1="250" x2="320" y2="250" />
+            <line class="maze-line" x1="390" y1="250" x2="460" y2="250" />
+            <line class="maze-line" x1="530" y1="250" x2="600" y2="250" />
+            <line class="maze-line" x1="670" y1="250" x2="740" y2="250" />
+            <line class="maze-line" x1="810" y1="250" x2="880" y2="250" />
+            <line class="maze-line" x1="950" y1="250" x2="1020" y2="250" />
+            <line class="maze-line" x1="1090" y1="250" x2="1160" y2="250" />
+            <line class="maze-line" x1="1230" y1="250" x2="1340" y2="250" />
 
-                <!-- Horizontal walls in row 3 -->
-                <line class="maze-line" x1="40" y1="250" x2="110" y2="250" />
-                <line class="maze-line" x1="180" y1="250" x2="320" y2="250" />
-                <line class="maze-line" x1="390" y1="250" x2="460" y2="250" />
-                <line class="maze-line" x1="530" y1="250" x2="600" y2="250" />
-                <line class="maze-line" x1="670" y1="250" x2="740" y2="250" />
-                <line class="maze-line" x1="810" y1="250" x2="880" y2="250" />
-                <line class="maze-line" x1="950" y1="250" x2="1020" y2="250" />
-                <line class="maze-line" x1="1090" y1="250" x2="1160" y2="250" />
-                <line class="maze-line" x1="1230" y1="250" x2="1340" y2="250" />
+            <!-- ROW 4 vertical walls -->
+            <line class="maze-line" x1="110" y1="250" x2="110" y2="390" />
+            <line class="maze-line" x1="180" y1="250" x2="180" y2="390" />
+            <line class="maze-line" x1="460" y1="250" x2="460" y2="390" />
+            <line class="maze-line" x1="530" y1="250" x2="530" y2="390" />
+            <line class="maze-line" x1="670" y1="250" x2="670" y2="390" />
+            <line class="maze-line" x1="810" y1="250" x2="810" y2="390" />
+            <line class="maze-line" x1="880" y1="250" x2="880" y2="390" />
+            <line class="maze-line" x1="950" y1="250" x2="950" y2="390" />
+            <line class="maze-line" x1="1160" y1="250" x2="1160" y2="320" />
+            <line class="maze-line" x1="1230" y1="250" x2="1230" y2="390" />
 
-                <!-- === ROW 4 (y=250 to y=320) === -->
-                <line class="maze-line" x1="110" y1="250" x2="110" y2="390" />
-                <line class="maze-line" x1="180" y1="250" x2="180" y2="390" />
-                <line class="maze-line" x1="460" y1="250" x2="460" y2="390" />
-                <line class="maze-line" x1="530" y1="250" x2="530" y2="390" />
-                <line class="maze-line" x1="670" y1="250" x2="670" y2="390" />
-                <line class="maze-line" x1="810" y1="250" x2="810" y2="390" />
-                <line class="maze-line" x1="880" y1="250" x2="880" y2="390" />
-                <line class="maze-line" x1="950" y1="250" x2="950" y2="390" />
-                <line class="maze-line" x1="1160" y1="250" x2="1160" y2="320" />
-                <line class="maze-line" x1="1230" y1="250" x2="1230" y2="390" />
+            <!-- ROW 4 horizontal walls -->
+            <line class="maze-line" x1="110" y1="320" x2="180" y2="320" />
+            <line class="maze-line" x1="250" y1="320" x2="320" y2="320" />
+            <line class="maze-line" x1="390" y1="320" x2="460" y2="320" />
+            <line class="maze-line" x1="600" y1="320" x2="670" y2="320" />
+            <line class="maze-line" x1="740" y1="320" x2="810" y2="320" />
+            <line class="maze-line" x1="880" y1="320" x2="950" y2="320" />
+            <line class="maze-line" x1="1020" y1="320" x2="1090" y2="320" />
+            <line class="maze-line" x1="1160" y1="320" x2="1230" y2="320" />
+            <line class="maze-line" x1="1270" y1="320" x2="1340" y2="320" />
 
-                <!-- Horizontal walls in row 4 -->
-                <line class="maze-line" x1="110" y1="320" x2="180" y2="320" />
-                <line class="maze-line" x1="250" y1="320" x2="320" y2="320" />
-                <line class="maze-line" x1="390" y1="320" x2="460" y2="320" />
-                <line class="maze-line" x1="600" y1="320" x2="670" y2="320" />
-                <line class="maze-line" x1="740" y1="320" x2="810" y2="320" />
-                <line class="maze-line" x1="880" y1="320" x2="950" y2="320" />
-                <line class="maze-line" x1="1020" y1="320" x2="1090" y2="320" />
-                <line class="maze-line" x1="1160" y1="320" x2="1230" y2="320" />
-                <line class="maze-line" x1="1270" y1="320" x2="1340" y2="320" />
+            <!-- ROW 5 vertical walls -->
+            <line class="maze-line" x1="250" y1="320" x2="250" y2="460" />
+            <line class="maze-line" x1="320" y1="320" x2="320" y2="530" />
+            <line class="maze-line" x1="390" y1="320" x2="390" y2="530" />
+            <line class="maze-line" x1="600" y1="320" x2="600" y2="530" />
+            <line class="maze-line" x1="740" y1="320" x2="740" y2="390" />
+            <line class="maze-line" x1="1020" y1="320" x2="1020" y2="460" />
+            <line class="maze-line" x1="1090" y1="320" x2="1090" y2="460" />
+            <line class="maze-line" x1="1160" y1="320" x2="1160" y2="460" />
 
-                <!-- === ROW 5 (y=320 to y=390) === -->
-                <line class="maze-line" x1="250" y1="320" x2="250" y2="460" />
-                <line class="maze-line" x1="320" y1="320" x2="320" y2="530" />
-                <line class="maze-line" x1="390" y1="320" x2="390" y2="530" />
-                <line class="maze-line" x1="600" y1="320" x2="600" y2="530" />
-                <line class="maze-line" x1="740" y1="320" x2="740" y2="390" />
-                <line class="maze-line" x1="1020" y1="320" x2="1020" y2="460" />
-                <line class="maze-line" x1="1090" y1="320" x2="1090" y2="460" />
-                <line class="maze-line" x1="1160" y1="320" x2="1160" y2="460" />
+            <!-- ROW 5 horizontal walls -->
+            <line class="maze-line" x1="40" y1="390" x2="180" y2="390" />
+            <line class="maze-line" x1="250" y1="390" x2="320" y2="390" />
+            <line class="maze-line" x1="390" y1="390" x2="460" y2="390" />
+            <line class="maze-line" x1="530" y1="390" x2="600" y2="390" />
+            <line class="maze-line" x1="670" y1="390" x2="740" y2="390" />
+            <line class="maze-line" x1="810" y1="390" x2="880" y2="390" />
+            <line class="maze-line" x1="950" y1="390" x2="1020" y2="390" />
+            <line class="maze-line" x1="1090" y1="390" x2="1230" y2="390" />
+            <line class="maze-line" x1="1270" y1="390" x2="1340" y2="390" />
 
-                <!-- Horizontal walls in row 5 -->
-                <line class="maze-line" x1="40" y1="390" x2="180" y2="390" />
-                <line class="maze-line" x1="250" y1="390" x2="320" y2="390" />
-                <line class="maze-line" x1="390" y1="390" x2="460" y2="390" />
-                <line class="maze-line" x1="530" y1="390" x2="600" y2="390" />
-                <line class="maze-line" x1="670" y1="390" x2="740" y2="390" />
-                <line class="maze-line" x1="810" y1="390" x2="880" y2="390" />
-                <line class="maze-line" x1="950" y1="390" x2="1020" y2="390" />
-                <line class="maze-line" x1="1090" y1="390" x2="1230" y2="390" />
-                <line class="maze-line" x1="1270" y1="390" x2="1340" y2="390" />
+            <!-- ROW 6 vertical walls -->
+            <line class="maze-line" x1="110" y1="390" x2="110" y2="460" />
+            <line class="maze-line" x1="180" y1="390" x2="180" y2="530" />
+            <line class="maze-line" x1="460" y1="390" x2="460" y2="530" />
+            <line class="maze-line" x1="530" y1="390" x2="530" y2="460" />
+            <line class="maze-line" x1="670" y1="390" x2="670" y2="530" />
+            <line class="maze-line" x1="740" y1="390" x2="740" y2="460" />
+            <line class="maze-line" x1="810" y1="390" x2="810" y2="530" />
+            <line class="maze-line" x1="880" y1="390" x2="880" y2="530" />
+            <line class="maze-line" x1="950" y1="390" x2="950" y2="530" />
+            <line class="maze-line" x1="1230" y1="390" x2="1230" y2="530" />
+            <line class="maze-line" x1="1270" y1="390" x2="1270" y2="530" />
 
-                <!-- === ROW 6 (y=390 to y=460) === -->
-                <line class="maze-line" x1="110" y1="390" x2="110" y2="460" />
-                <line class="maze-line" x1="180" y1="390" x2="180" y2="530" />
-                <line class="maze-line" x1="460" y1="390" x2="460" y2="530" />
-                <line class="maze-line" x1="530" y1="390" x2="530" y2="460" />
-                <line class="maze-line" x1="670" y1="390" x2="670" y2="530" />
-                <line class="maze-line" x1="740" y1="390" x2="740" y2="460" />
-                <line class="maze-line" x1="810" y1="390" x2="810" y2="530" />
-                <line class="maze-line" x1="880" y1="390" x2="880" y2="530" />
-                <line class="maze-line" x1="950" y1="390" x2="950" y2="530" />
-                <line class="maze-line" x1="1230" y1="390" x2="1230" y2="530" />
-                <line class="maze-line" x1="1270" y1="390" x2="1270" y2="530" />
+            <!-- ROW 6 horizontal walls -->
+            <line class="maze-line" x1="40" y1="460" x2="110" y2="460" />
+            <line class="maze-line" x1="250" y1="460" x2="320" y2="460" />
+            <line class="maze-line" x1="390" y1="460" x2="460" y2="460" />
+            <line class="maze-line" x1="530" y1="460" x2="600" y2="460" />
+            <line class="maze-line" x1="740" y1="460" x2="810" y2="460" />
+            <line class="maze-line" x1="1020" y1="460" x2="1090" y2="460" />
+            <line class="maze-line" x1="1160" y1="460" x2="1230" y2="460" />
+            <line class="maze-line" x1="1270" y1="460" x2="1340" y2="460" />
 
-                <!-- Horizontal walls in row 6 -->
-                <line class="maze-line" x1="40" y1="460" x2="110" y2="460" />
-                <line class="maze-line" x1="250" y1="460" x2="320" y2="460" />
-                <line class="maze-line" x1="390" y1="460" x2="460" y2="460" />
-                <line class="maze-line" x1="530" y1="460" x2="600" y2="460" />
-                <line class="maze-line" x1="740" y1="460" x2="810" y2="460" />
-                <line class="maze-line" x1="1020" y1="460" x2="1090" y2="460" />
-                <line class="maze-line" x1="1160" y1="460" x2="1230" y2="460" />
-                <line class="maze-line" x1="1270" y1="460" x2="1340" y2="460" />
+            <!-- ROW 7 vertical walls -->
+            <line class="maze-line" x1="110" y1="460" x2="110" y2="530" />
+            <line class="maze-line" x1="250" y1="460" x2="250" y2="600" />
+            <line class="maze-line" x1="530" y1="460" x2="530" y2="600" />
+            <line class="maze-line" x1="740" y1="460" x2="740" y2="670" />
+            <line class="maze-line" x1="1020" y1="460" x2="1020" y2="600" />
+            <line class="maze-line" x1="1090" y1="460" x2="1090" y2="600" />
+            <line class="maze-line" x1="1160" y1="460" x2="1160" y2="600" />
 
-                <!-- === ROW 7 (y=460 to y=530) === -->
-                <line class="maze-line" x1="110" y1="460" x2="110" y2="530" />
-                <line class="maze-line" x1="250" y1="460" x2="250" y2="600" />
-                <line class="maze-line" x1="530" y1="460" x2="530" y2="600" />
-                <line class="maze-line" x1="740" y1="460" x2="740" y2="670" />
-                <line class="maze-line" x1="1020" y1="460" x2="1020" y2="600" />
-                <line class="maze-line" x1="1090" y1="460" x2="1090" y2="600" />
-                <line class="maze-line" x1="1160" y1="460" x2="1160" y2="600" />
+            <!-- ROW 7 horizontal walls -->
+            <line class="maze-line" x1="40" y1="530" x2="180" y2="530" />
+            <line class="maze-line" x1="180" y1="530" x2="320" y2="530" />
+            <line class="maze-line" x1="390" y1="530" x2="530" y2="530" />
+            <line class="maze-line" x1="600" y1="530" x2="670" y2="530" />
+            <line class="maze-line" x1="740" y1="530" x2="810" y2="530" />
+            <line class="maze-line" x1="880" y1="530" x2="950" y2="530" />
+            <line class="maze-line" x1="1020" y1="530" x2="1160" y2="530" />
+            <line class="maze-line" x1="1230" y1="530" x2="1340" y2="530" />
 
-                <!-- Horizontal walls in row 7 -->
-                <line class="maze-line" x1="40" y1="530" x2="110" y2="530" />
-                <line class="maze-line" x1="110" y1="530" x2="180" y2="530" />
-                <line class="maze-line" x1="180" y1="530" x2="320" y2="530" />
-                <line class="maze-line" x1="390" y1="530" x2="530" y2="530" />
-                <line class="maze-line" x1="600" y1="530" x2="670" y2="530" />
-                <line class="maze-line" x1="740" y1="530" x2="810" y2="530" />
-                <line class="maze-line" x1="880" y1="530" x2="950" y2="530" />
-                <line class="maze-line" x1="1020" y1="530" x2="1160" y2="530" />
-                <line class="maze-line" x1="1230" y1="530" x2="1340" y2="530" />
+            <!-- ROW 8 vertical walls -->
+            <line class="maze-line" x1="110" y1="530" x2="110" y2="670" />
+            <line class="maze-line" x1="180" y1="530" x2="180" y2="670" />
+            <line class="maze-line" x1="320" y1="530" x2="320" y2="670" />
+            <line class="maze-line" x1="390" y1="530" x2="390" y2="670" />
+            <line class="maze-line" x1="460" y1="530" x2="460" y2="600" />
+            <line class="maze-line" x1="600" y1="530" x2="600" y2="670" />
+            <line class="maze-line" x1="670" y1="530" x2="670" y2="600" />
+            <line class="maze-line" x1="810" y1="530" x2="810" y2="670" />
+            <line class="maze-line" x1="880" y1="530" x2="880" y2="600" />
+            <line class="maze-line" x1="950" y1="530" x2="950" y2="670" />
+            <line class="maze-line" x1="1230" y1="530" x2="1230" y2="670" />
+            <line class="maze-line" x1="1270" y1="530" x2="1270" y2="670" />
 
-                <!-- === ROW 8 (y=530 to y=600) === -->
-                <line class="maze-line" x1="110" y1="530" x2="110" y2="670" />
-                <line class="maze-line" x1="180" y1="530" x2="180" y2="670" />
-                <line class="maze-line" x1="320" y1="530" x2="320" y2="670" />
-                <line class="maze-line" x1="390" y1="530" x2="390" y2="670" />
-                <line class="maze-line" x1="460" y1="530" x2="460" y2="600" />
-                <line class="maze-line" x1="600" y1="530" x2="600" y2="670" />
-                <line class="maze-line" x1="670" y1="530" x2="670" y2="600" />
-                <line class="maze-line" x1="810" y1="530" x2="810" y2="670" />
-                <line class="maze-line" x1="880" y1="530" x2="880" y2="600" />
-                <line class="maze-line" x1="950" y1="530" x2="950" y2="670" />
-                <line class="maze-line" x1="1230" y1="530" x2="1230" y2="670" />
-                <line class="maze-line" x1="1270" y1="530" x2="1270" y2="670" />
+            <!-- ROW 8 horizontal walls -->
+            <line class="maze-line" x1="110" y1="600" x2="180" y2="600" />
+            <line class="maze-line" x1="250" y1="600" x2="320" y2="600" />
+            <line class="maze-line" x1="460" y1="600" x2="530" y2="600" />
+            <line class="maze-line" x1="600" y1="600" x2="740" y2="600" />
+            <line class="maze-line" x1="880" y1="600" x2="950" y2="600" />
+            <line class="maze-line" x1="1020" y1="600" x2="1090" y2="600" />
+            <line class="maze-line" x1="1160" y1="600" x2="1230" y2="600" />
 
-                <!-- Horizontal walls in row 8 -->
-                <line class="maze-line" x1="110" y1="600" x2="180" y2="600" />
-                <line class="maze-line" x1="250" y1="600" x2="320" y2="600" />
-                <line class="maze-line" x1="460" y1="600" x2="530" y2="600" />
-                <line class="maze-line" x1="600" y1="600" x2="670" y2="600" />
-                <line class="maze-line" x1="670" y1="600" x2="740" y2="600" />
-                <line class="maze-line" x1="880" y1="600" x2="950" y2="600" />
-                <line class="maze-line" x1="1020" y1="600" x2="1090" y2="600" />
-                <line class="maze-line" x1="1160" y1="600" x2="1230" y2="600" />
+            <!-- ROW 9 vertical walls -->
+            <line class="maze-line" x1="250" y1="600" x2="250" y2="740" />
+            <line class="maze-line" x1="460" y1="600" x2="460" y2="670" />
+            <line class="maze-line" x1="530" y1="600" x2="530" y2="810" />
+            <line class="maze-line" x1="670" y1="600" x2="670" y2="740" />
+            <line class="maze-line" x1="880" y1="600" x2="880" y2="740" />
+            <line class="maze-line" x1="1020" y1="600" x2="1020" y2="740" />
+            <line class="maze-line" x1="1090" y1="600" x2="1090" y2="740" />
+            <line class="maze-line" x1="1160" y1="600" x2="1160" y2="740" />
 
-                <!-- === ROW 9 (y=600 to y=670) === -->
-                <line class="maze-line" x1="250" y1="600" x2="250" y2="740" />
-                <line class="maze-line" x1="460" y1="600" x2="460" y2="670" />
-                <line class="maze-line" x1="530" y1="600" x2="530" y2="810" />
-                <line class="maze-line" x1="670" y1="600" x2="670" y2="740" />
-                <line class="maze-line" x1="880" y1="600" x2="880" y2="740" />
-                <line class="maze-line" x1="1020" y1="600" x2="1020" y2="740" />
-                <line class="maze-line" x1="1090" y1="600" x2="1090" y2="740" />
-                <line class="maze-line" x1="1160" y1="600" x2="1160" y2="740" />
+            <!-- ROW 9 horizontal walls -->
+            <line class="maze-line" x1="40" y1="670" x2="180" y2="670" />
+            <line class="maze-line" x1="250" y1="670" x2="320" y2="670" />
+            <line class="maze-line" x1="390" y1="670" x2="530" y2="670" />
+            <line class="maze-line" x1="600" y1="670" x2="740" y2="670" />
+            <line class="maze-line" x1="810" y1="670" x2="880" y2="670" />
+            <line class="maze-line" x1="950" y1="670" x2="1020" y2="670" />
+            <line class="maze-line" x1="1090" y1="670" x2="1160" y2="670" />
+            <line class="maze-line" x1="1230" y1="670" x2="1340" y2="670" />
 
-                <!-- Horizontal walls in row 9 -->
-                <line class="maze-line" x1="40" y1="670" x2="180" y2="670" />
-                <line class="maze-line" x1="250" y1="670" x2="320" y2="670" />
-                <line class="maze-line" x1="390" y1="670" x2="530" y2="670" />
-                <line class="maze-line" x1="600" y1="670" x2="740" y2="670" />
-                <line class="maze-line" x1="810" y1="670" x2="880" y2="670" />
-                <line class="maze-line" x1="950" y1="670" x2="1020" y2="670" />
-                <line class="maze-line" x1="1090" y1="670" x2="1160" y2="670" />
-                <line class="maze-line" x1="1230" y1="670" x2="1340" y2="670" />
+            <!-- ROW 10 vertical walls -->
+            <line class="maze-line" x1="110" y1="670" x2="110" y2="810" />
+            <line class="maze-line" x1="180" y1="670" x2="180" y2="740" />
+            <line class="maze-line" x1="320" y1="670" x2="320" y2="810" />
+            <line class="maze-line" x1="390" y1="670" x2="390" y2="810" />
+            <line class="maze-line" x1="460" y1="670" x2="460" y2="740" />
+            <line class="maze-line" x1="600" y1="670" x2="600" y2="740" />
+            <line class="maze-line" x1="740" y1="670" x2="740" y2="810" />
+            <line class="maze-line" x1="810" y1="670" x2="810" y2="740" />
+            <line class="maze-line" x1="950" y1="670" x2="950" y2="810" />
+            <line class="maze-line" x1="1230" y1="670" x2="1230" y2="740" />
+            <line class="maze-line" x1="1270" y1="670" x2="1270" y2="740" />
 
-                <!-- === ROW 10 (y=670 to y=740) === -->
-                <line class="maze-line" x1="110" y1="670" x2="110" y2="810" />
-                <line class="maze-line" x1="180" y1="670" x2="180" y2="740" />
-                <line class="maze-line" x1="320" y1="670" x2="320" y2="810" />
-                <line class="maze-line" x1="390" y1="670" x2="390" y2="810" />
-                <line class="maze-line" x1="460" y1="670" x2="460" y2="740" />
-                <line class="maze-line" x1="600" y1="670" x2="600" y2="740" />
-                <line class="maze-line" x1="740" y1="670" x2="740" y2="810" />
-                <line class="maze-line" x1="810" y1="670" x2="810" y2="740" />
-                <line class="maze-line" x1="950" y1="670" x2="950" y2="810" />
-                <line class="maze-line" x1="1230" y1="670" x2="1230" y2="740" />
-                <line class="maze-line" x1="1270" y1="670" x2="1270" y2="740" />
+            <!-- ROW 10 horizontal walls -->
+            <line class="maze-line" x1="40" y1="740" x2="110" y2="740" />
+            <line class="maze-line" x1="180" y1="740" x2="250" y2="740" />
+            <line class="maze-line" x1="320" y1="740" x2="460" y2="740" />
+            <line class="maze-line" x1="530" y1="740" x2="600" y2="740" />
+            <line class="maze-line" x1="670" y1="740" x2="740" y2="740" />
+            <line class="maze-line" x1="810" y1="740" x2="950" y2="740" />
+            <line class="maze-line" x1="1020" y1="740" x2="1090" y2="740" />
+            <line class="maze-line" x1="1160" y1="740" x2="1230" y2="740" />
 
-                <!-- Horizontal walls in row 10 -->
-                <line class="maze-line" x1="40" y1="740" x2="110" y2="740" />
-                <line class="maze-line" x1="180" y1="740" x2="250" y2="740" />
-                <line class="maze-line" x1="320" y1="740" x2="460" y2="740" />
-                <line class="maze-line" x1="530" y1="740" x2="600" y2="740" />
-                <line class="maze-line" x1="670" y1="740" x2="740" y2="740" />
-                <line class="maze-line" x1="810" y1="740" x2="950" y2="740" />
-                <line class="maze-line" x1="1020" y1="740" x2="1090" y2="740" />
-                <line class="maze-line" x1="1160" y1="740" x2="1230" y2="740" />
+            <!-- ROW 11 vertical walls -->
+            <line class="maze-line" x1="180" y1="740" x2="180" y2="860" />
+            <line class="maze-line" x1="250" y1="740" x2="250" y2="860" />
+            <line class="maze-line" x1="460" y1="740" x2="460" y2="860" />
+            <line class="maze-line" x1="600" y1="740" x2="600" y2="860" />
+            <line class="maze-line" x1="670" y1="740" x2="670" y2="860" />
+            <line class="maze-line" x1="810" y1="740" x2="810" y2="860" />
+            <line class="maze-line" x1="880" y1="740" x2="880" y2="860" />
+            <line class="maze-line" x1="1020" y1="740" x2="1020" y2="860" />
+            <line class="maze-line" x1="1090" y1="740" x2="1090" y2="860" />
+            <line class="maze-line" x1="1160" y1="740" x2="1160" y2="860" />
 
-                <!-- === ROW 11 (y=740 to y=810) === -->
-                <line class="maze-line" x1="180" y1="740" x2="180" y2="860" />
-                <line class="maze-line" x1="250" y1="740" x2="250" y2="860" />
-                <line class="maze-line" x1="460" y1="740" x2="460" y2="860" />
-                <line class="maze-line" x1="600" y1="740" x2="600" y2="860" />
-                <line class="maze-line" x1="670" y1="740" x2="670" y2="860" />
-                <line class="maze-line" x1="810" y1="740" x2="810" y2="860" />
-                <line class="maze-line" x1="880" y1="740" x2="880" y2="860" />
-                <line class="maze-line" x1="1020" y1="740" x2="1020" y2="860" />
-                <line class="maze-line" x1="1090" y1="740" x2="1090" y2="860" />
-                <line class="maze-line" x1="1160" y1="740" x2="1160" y2="860" />
-
-                <!-- Horizontal walls in row 11 -->
-                <line class="maze-line" x1="110" y1="810" x2="180" y2="810" />
-                <line class="maze-line" x1="250" y1="810" x2="320" y2="810" />
-                <line class="maze-line" x1="390" y1="810" x2="460" y2="810" />
-                <line class="maze-line" x1="530" y1="810" x2="600" y2="810" />
-                <line class="maze-line" x1="740" y1="810" x2="810" y2="810" />
-                <line class="maze-line" x1="950" y1="810" x2="1020" y2="810" />
-                <line class="maze-line" x1="1090" y1="810" x2="1160" y2="810" />
-                <line class="maze-line" x1="1230" y1="810" x2="1340" y2="810" />
-            </g>
+            <!-- ROW 11 horizontal walls -->
+            <line class="maze-line" x1="110" y1="810" x2="180" y2="810" />
+            <line class="maze-line" x1="250" y1="810" x2="320" y2="810" />
+            <line class="maze-line" x1="390" y1="810" x2="460" y2="810" />
+            <line class="maze-line" x1="530" y1="810" x2="600" y2="810" />
+            <line class="maze-line" x1="740" y1="810" x2="810" y2="810" />
+            <line class="maze-line" x1="950" y1="810" x2="1020" y2="810" />
+            <line class="maze-line" x1="1090" y1="810" x2="1160" y2="810" />
+            <line class="maze-line" x1="1230" y1="810" x2="1340" y2="810" />
 
             <!-- Exit arrow -->
             <line class="arrow" x1="1350" y1="770" x2="1375" y2="770" />
