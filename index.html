@@ -96,6 +96,7 @@
         const overlay = document.getElementById('flashlight-overlay');
         const cursor = document.getElementById('custom-cursor');
         const player = document.getElementById('player');
+        const mazeImage = document.getElementById('maze-image');
 
         let mouseX = -200;
         let mouseY = -200;
@@ -111,6 +112,88 @@
         // Movement settings
         const moveSpeed = 1;
         const friction = 0.85;
+
+        // Collision detection setup
+        let collisionCanvas = null;
+        let collisionCtx = null;
+        let mazeRect = null;
+        let mazeScale = 1;
+
+        // Initialize collision detection
+        function initCollision() {
+            collisionCanvas = document.createElement('canvas');
+            collisionCtx = collisionCanvas.getContext('2d', { willReadFrequently: true });
+
+            // Set canvas size to match maze image natural size
+            collisionCanvas.width = mazeImage.naturalWidth;
+            collisionCanvas.height = mazeImage.naturalHeight;
+
+            // Draw maze to canvas
+            collisionCtx.drawImage(mazeImage, 0, 0);
+
+            updateMazeRect();
+        }
+
+        // Update maze position info
+        function updateMazeRect() {
+            mazeRect = mazeImage.getBoundingClientRect();
+            mazeScale = mazeImage.naturalWidth / mazeRect.width;
+        }
+
+        // Check if a screen position is on a wall (white pixel)
+        function isWall(screenX, screenY) {
+            if (!collisionCtx || !mazeRect) return false;
+
+            // Convert screen position to maze image coordinates
+            const mazeX = Math.floor((screenX - mazeRect.left) * mazeScale);
+            const mazeY = Math.floor((screenY - mazeRect.top) * mazeScale);
+
+            // Check if position is outside maze bounds
+            if (mazeX < 0 || mazeX >= collisionCanvas.width ||
+                mazeY < 0 || mazeY >= collisionCanvas.height) {
+                return true; // Treat outside as wall
+            }
+
+            // Get pixel color at position
+            const pixel = collisionCtx.getImageData(mazeX, mazeY, 1, 1).data;
+
+            // Check if pixel is white (wall) - threshold for white
+            const brightness = (pixel[0] + pixel[1] + pixel[2]) / 3;
+            return brightness > 200;
+        }
+
+        // Check collision for player at given position
+        function checkCollision(x, y) {
+            // Check multiple points around the player for better collision
+            const checkRadius = 8;
+            const points = [
+                { x: x, y: y },                          // Center
+                { x: x - checkRadius, y: y },            // Left
+                { x: x + checkRadius, y: y },            // Right
+                { x: x, y: y - checkRadius },            // Top
+                { x: x, y: y + checkRadius },            // Bottom
+            ];
+
+            for (const point of points) {
+                if (isWall(point.x, point.y)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Initialize when maze image loads
+        mazeImage.onload = function() {
+            initCollision();
+        };
+
+        // If image already loaded
+        if (mazeImage.complete) {
+            initCollision();
+        }
+
+        // Update maze rect on resize
+        window.addEventListener('resize', updateMazeRect);
 
         // Track pressed keys
         const keys = {
@@ -177,8 +260,23 @@
             playerVelX *= friction;
             playerVelY *= friction;
 
-            playerX += playerVelX;
-            playerY += playerVelY;
+            // Calculate new position
+            let newX = playerX + playerVelX;
+            let newY = playerY + playerVelY;
+
+            // Check collision for X movement
+            if (!checkCollision(newX, playerY)) {
+                playerX = newX;
+            } else {
+                playerVelX = 0;
+            }
+
+            // Check collision for Y movement
+            if (!checkCollision(playerX, newY)) {
+                playerY = newY;
+            } else {
+                playerVelY = 0;
+            }
 
             player.style.left = `${playerX}px`;
             player.style.top = `${playerY}px`;
